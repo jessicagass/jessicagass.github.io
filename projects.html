@@ -37,40 +37,48 @@
       <div class="section-inner">
         <h2>Featured Projects</h2>
         <div class="cards project-showcase">
-          <div class="card">
-            <h3>Outlook Recurring Email Scheduler</h3>
-            <p>
-              A Python script that automatically sends recurring emails through Outlook at scheduled times.
-              It uses <code>pywin32</code> and <code>schedule</code> to automate routine outreach while keeping timing flexible.
-            </p>
-            <div class="inline-actions">
-              <button class="button" id="download-btn">Download Code</button>
+          <details class="card project-card" open>
+            <summary class="project-card-summary">
+              <div>
+                <h3>Outlook Recurring Email Scheduler</h3>
+                <p>
+                  A Python script that automatically sends recurring emails through Outlook at scheduled times.
+                  It uses <code>pywin32</code> and <code>schedule</code> to automate routine outreach while keeping timing flexible.
+                </p>
+              </div>
+              <span class="project-card-toggle" aria-hidden="true">Expand project</span>
+            </summary>
+
+            <div class="project-card-body">
+              <div class="inline-actions">
+                <button class="button" id="download-btn">Download Code</button>
+              </div>
+
+              <details class="project-details">
+                <summary>Instructions for full automation</summary>
+                <ol>
+                  <li>Open Task Scheduler.</li>
+                  <li>Create a basic task.</li>
+                  <li>Choose a trigger such as <em>At log on</em> or <em>Daily</em>.</li>
+                  <li>Select <em>Start a program</em> as the action.</li>
+                  <li>Set the program to <code>python.exe</code>.</li>
+                  <li>Provide <code>C:\path\to\outlook_scheduler.py</code> as the argument.</li>
+                  <li>Set <code>C:\path\to\</code> as the start-in directory.</li>
+                </ol>
+              </details>
+
+              <details class="project-details">
+                <summary>Scheduling options and adjustments</summary>
+                <p>You can adjust when the script sends emails and who receives them:</p>
+                <ul>
+                  <li><strong>Daily at 9:00 AM:</strong> <code>schedule.every().day.at("09:00").do(send_outlook_email)</code></li>
+                  <li><strong>Weekly:</strong> <code>schedule.every().monday.at("10:30").do(send_outlook_email)</code></li>
+                  <li><strong>Every 2 hours:</strong> <code>schedule.every(2).hours.do(send_outlook_email)</code></li>
+                  <li><strong>Multiple recipients:</strong> <code>mail.To = "a@example.com; b@example.com"</code></li>
+                </ul>
+              </details>
             </div>
-
-            <details class="project-details">
-              <summary>Instructions for full automation</summary>
-              <ol>
-                <li>Open Task Scheduler.</li>
-                <li>Create a basic task.</li>
-                <li>Choose a trigger such as <em>At log on</em> or <em>Daily</em>.</li>
-                <li>Select <em>Start a program</em> as the action.</li>
-                <li>Set the program to <code>python.exe</code>.</li>
-                <li>Provide <code>C:\path\to\outlook_scheduler.py</code> as the argument.</li>
-                <li>Set <code>C:\path\to\</code> as the start-in directory.</li>
-              </ol>
-            </details>
-
-            <details class="project-details">
-              <summary>Scheduling options and adjustments</summary>
-              <p>You can adjust when the script sends emails and who receives them:</p>
-              <ul>
-                <li><strong>Daily at 9:00 AM:</strong> <code>schedule.every().day.at("09:00").do(send_outlook_email)</code></li>
-                <li><strong>Weekly:</strong> <code>schedule.every().monday.at("10:30").do(send_outlook_email)</code></li>
-                <li><strong>Every 2 hours:</strong> <code>schedule.every(2).hours.do(send_outlook_email)</code></li>
-                <li><strong>Multiple recipients:</strong> <code>mail.To = "a@example.com; b@example.com"</code></li>
-              </ul>
-            </details>
-          </div>
+          </details>
         </div>
       </div>
     </section>
