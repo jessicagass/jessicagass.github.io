@@ -23,52 +23,54 @@
   <main>
     <section class="hero">
       <div class="section-inner">
-        <span class="eyebrow">Projects</span>
-        <h2>Practical tools that support research and professional workflows.</h2>
-        <p class="intro-copy">
-          A selection of lightweight tools and resources designed to make recurring administrative and communication tasks more efficient.
-        </p>
+        <div class="hero-panel">
+          <span class="eyebrow">Projects</span>
+          <h2>Practical tools that support research and professional workflows.</h2>
+          <p>
+            A selection of lightweight tools and resources designed to make recurring administrative and communication tasks more efficient.
+          </p>
+        </div>
       </div>
     </section>
 
     <section class="highlights">
       <div class="section-inner">
-        <div class="section-heading">
-          <h2>Featured Project</h2>
-        </div>
-        <div class="content-block">
-          <h3>Outlook Recurring Email Scheduler</h3>
-          <p>
-            A Python script that automatically sends recurring emails through Outlook at scheduled times.
-            It uses <code>pywin32</code> and <code>schedule</code> to automate routine outreach while keeping timing flexible.
-          </p>
-          <div class="inline-actions">
-            <button class="button" id="download-btn">Download Code</button>
+        <h2>Featured Project</h2>
+        <div class="cards">
+          <div class="card">
+            <h3>Outlook Recurring Email Scheduler</h3>
+            <p>
+              A Python script that automatically sends recurring emails through Outlook at scheduled times.
+              It uses <code>pywin32</code> and <code>schedule</code> to automate routine outreach while keeping timing flexible.
+            </p>
+            <div class="inline-actions">
+              <button class="button" id="download-btn">Download Code</button>
+            </div>
+
+            <details class="project-details">
+              <summary>Instructions for full automation</summary>
+              <ol>
+                <li>Open Task Scheduler.</li>
+                <li>Create a basic task.</li>
+                <li>Choose a trigger such as <em>At log on</em> or <em>Daily</em>.</li>
+                <li>Select <em>Start a program</em> as the action.</li>
+                <li>Set the program to <code>python.exe</code>.</li>
+                <li>Provide <code>C:\path\to\outlook_scheduler.py</code> as the argument.</li>
+                <li>Set <code>C:\path\to\</code> as the start-in directory.</li>
+              </ol>
+            </details>
+
+            <details class="project-details">
+              <summary>Scheduling options and adjustments</summary>
+              <p>You can adjust when the script sends emails and who receives them:</p>
+              <ul>
+                <li><strong>Daily at 9:00 AM:</strong> <code>schedule.every().day.at("09:00").do(send_outlook_email)</code></li>
+                <li><strong>Weekly:</strong> <code>schedule.every().monday.at("10:30").do(send_outlook_email)</code></li>
+                <li><strong>Every 2 hours:</strong> <code>schedule.every(2).hours.do(send_outlook_email)</code></li>
+                <li><strong>Multiple recipients:</strong> <code>mail.To = "a@example.com; b@example.com"</code></li>
+              </ul>
+            </details>
           </div>
-
-          <details class="project-details">
-            <summary>Instructions for full automation</summary>
-            <ol>
-              <li>Open Task Scheduler.</li>
-              <li>Create a basic task.</li>
-              <li>Choose a trigger such as <em>At log on</em> or <em>Daily</em>.</li>
-              <li>Select <em>Start a program</em> as the action.</li>
-              <li>Set the program to <code>python.exe</code>.</li>
-              <li>Provide <code>C:\path\to\outlook_scheduler.py</code> as the argument.</li>
-              <li>Set <code>C:\path\to\</code> as the start-in directory.</li>
-            </ol>
-          </details>
-
-          <details class="project-details">
-            <summary>Scheduling options and adjustments</summary>
-            <p>You can adjust when the script sends emails and who receives them:</p>
-            <ul>
-              <li><strong>Daily at 9:00 AM:</strong> <code>schedule.every().day.at("09:00").do(send_outlook_email)</code></li>
-              <li><strong>Weekly:</strong> <code>schedule.every().monday.at("10:30").do(send_outlook_email)</code></li>
-              <li><strong>Every 2 hours:</strong> <code>schedule.every(2).hours.do(send_outlook_email)</code></li>
-              <li><strong>Multiple recipients:</strong> <code>mail.To = "a@example.com; b@example.com"</code></li>
-            </ul>
-          </details>
         </div>
       </div>
     </section>
