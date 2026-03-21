@@ -136,6 +136,7 @@
           <div class="schedule-actions">
             <button type="button" class="button-secondary" id="saveScheduleBtn">Save Schedule</button>
             <button type="button" class="button-secondary" id="downloadScheduleBtn">Download Schedule</button>
+            <button type="button" class="button-secondary" id="resetScheduleBtn">Reset Scheduler</button>
           </div>
 
           <div id="schedulerStatus" class="scheduler-status" aria-live="polite">
@@ -201,6 +202,7 @@ while True:
     const meetingDaysInput = document.getElementById("meetingDays");
     const saveScheduleBtn = document.getElementById("saveScheduleBtn");
     const downloadScheduleBtn = document.getElementById("downloadScheduleBtn");
+    const resetScheduleBtn = document.getElementById("resetScheduleBtn");
     const calendarEl = document.getElementById("calendar");
     const schedulerStatus = document.getElementById("schedulerStatus");
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -287,6 +289,10 @@ while True:
       persistSchedulerState();
       downloadScheduleFile();
       renderCalendar("Schedule downloaded successfully.");
+    });
+
+    resetScheduleBtn.addEventListener("click", () => {
+      resetScheduler();
     });
 
     function parseWeekdays(value) {
@@ -673,6 +679,18 @@ while True:
       };
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function resetScheduler() {
+      projects = [];
+      scheduleSettings = { ...DEFAULT_SETTINGS };
+      latestSchedule = [];
+      latestSummary = null;
+      projectForm.reset();
+      scheduleSettingsForm.reset();
+      applySettingsFromInputs();
+      localStorage.removeItem(STORAGE_KEY);
+      renderCalendar("Scheduler reset. Add a project to build a new plan.");
     }
 
     function restoreSchedulerState() {
