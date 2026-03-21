@@ -413,6 +413,7 @@ footer {
 
 .project-showcase {
   align-items: stretch;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .feature-list {
@@ -479,7 +480,14 @@ footer {
 
 .schedule-day-title {
   display: block;
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.schedule-day-hours {
+  margin: -0.3rem 0 0.9rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
 }
 
 .task-pill {

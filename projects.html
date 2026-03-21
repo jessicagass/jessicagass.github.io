@@ -71,19 +71,6 @@
               </ul>
             </details>
           </div>
-
-          <div class="card">
-            <h3>Interactive Project Scheduler</h3>
-            <p>
-              A browser-based planner for mapping project deadlines, progress, and task steps into a two-week schedule.
-              Add a project, assign importance, and click tasks as you complete them.
-            </p>
-            <ul class="compact-list feature-list">
-              <li>Prioritizes projects by urgency, remaining progress, and importance.</li>
-              <li>Spreads steps across the next 14 days without altering your source entries.</li>
-              <li>Keeps completed tasks visually distinct for quick status tracking.</li>
-            </ul>
-          </div>
         </div>
       </div>
     </section>
@@ -92,10 +79,10 @@
       <div class="section-inner">
         <div class="panel scheduler-panel">
           <div class="scheduler-header">
-            <span class="eyebrow">Interactive Tool</span>
-            <h2>Interactive Project Scheduler</h2>
+            <span class="eyebrow">Interactive Project Scheduler</span>
+            <h2>Build a balanced project plan</h2>
             <p class="lead">
-              Build a short-range plan for active projects by entering each deadline, current stage, and estimated steps.
+              Enter a deadline, progress, and total hours to spread the remaining work as evenly as possible across the days leading up to the deadline. Detailed step entries are optional.
             </p>
           </div>
 
@@ -112,8 +99,11 @@
             <label>Importance (1-5)
               <input type="number" id="importance" name="importance" min="1" max="5" required>
             </label>
-            <label class="scheduler-form-full">Steps (comma separated, format Step:hours)
-              <input type="text" id="steps" name="steps" placeholder="Design:2, Coding:3, Test:1">
+            <label>Total Project Time (hours)
+              <input type="number" id="totalHours" name="totalHours" min="0.5" step="0.5" required>
+            </label>
+            <label class="scheduler-form-full">Optional Steps (comma separated, format Step:hours)
+              <input type="text" id="steps" name="steps" placeholder="Research:4, Draft:6, Revise:2">
             </label>
             <div class="inline-actions scheduler-form-full">
               <button type="submit" class="button">Add Project</button>
@@ -195,46 +185,84 @@ while True:
       const stage = Number(document.getElementById("projectStage").value);
       const deadline = document.getElementById("deadline").value;
       const importance = Number(document.getElementById("importance").value);
+      const totalHours = Number(document.getElementById("totalHours").value);
       const stepsInput = document.getElementById("steps").value.trim();
+      const parsedSteps = parseSteps(stepsInput, totalHours);
 
-      const steps = stepsInput
-        ? stepsInput
-            .split(",")
-            .map((entry) => {
-              const [desc, time] = entry.split(":");
-              return {
-                desc: (desc || "Planning task").trim(),
-                time: Number(time) || 1,
-                completed: false,
-              };
-            })
-            .filter((step) => step.desc)
-        : [{ desc: "General project work", time: 1, completed: false }];
+      projects.push({
+        id: crypto.randomUUID(),
+        name,
+        stage,
+        deadline,
+        importance,
+        totalHours,
+        steps: parsedSteps,
+      });
 
-      projects.push({ name, stage, deadline, importance, steps });
       projectForm.reset();
       renderCalendar();
     });
 
+    function parseSteps(stepsInput, totalHours) {
+      if (!stepsInput) {
+        return [{ id: crypto.randomUUID(), desc: "General project work", time: totalHours, completed: false }];
+      }
+
+      const parsed = stepsInput
+        .split(",")
+        .map((entry) => {
+          const [desc, time] = entry.split(":");
+          return {
+            id: crypto.randomUUID(),
+            desc: (desc || "Planning task").trim(),
+            time: Math.max(Number(time) || 0, 0),
+            completed: false,
+          };
+        })
+        .filter((step) => step.desc);
+
+      const totalStepHours = parsed.reduce((sum, step) => sum + step.time, 0);
+
+      if (!parsed.length || totalStepHours <= 0) {
+        return [{ id: crypto.randomUUID(), desc: "General project work", time: totalHours, completed: false }];
+      }
+
+      return parsed;
+    }
+
     function prioritizeProjects() {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const today = startOfDay(new Date());
 
       return projects
         .map((project) => {
-          const deadlineDate = new Date(`${project.deadline}T00:00:00`);
-          const daysLeft = Math.ceil((deadlineDate - today) / MS_PER_DAY);
-          const urgency = (100 - project.stage) / Math.max(daysLeft, 1);
-          const priorityScore = urgency * project.importance;
+          const deadlineDate = startOfDay(new Date(`${project.deadline}T00:00:00`));
+          const daysLeft = Math.max(Math.ceil((deadlineDate - today) / MS_PER_DAY) + 1, 1);
+          const remainingHours = roundHours(project.totalHours * ((100 - project.stage) / 100));
+          const priorityScore = ((remainingHours || 0.25) / daysLeft) * project.importance;
 
           return {
             ...project,
-            priorityScore,
+            deadlineDate,
             daysLeft,
-            steps: project.steps.map((step, index) => ({ ...step, originalIndex: index })),
+            remainingHours,
+            priorityScore,
           };
         })
         .sort((a, b) => b.priorityScore - a.priorityScore);
+    }
+
+    function startOfDay(date) {
+      const copy = new Date(date);
+      copy.setHours(0, 0, 0, 0);
+      return copy;
+    }
+
+    function roundHours(value) {
+      return Math.round(value * 100) / 100;
+    }
+
+    function formatHours(value) {
+      return Number.isInteger(value) ? `${value}` : value.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
     }
 
     function formatDate(date) {
@@ -243,6 +271,124 @@ while True:
         month: "short",
         day: "numeric",
       });
+    }
+
+    function buildSchedule(sortedProjects) {
+      const today = startOfDay(new Date());
+      const schedule = Array.from({ length: 14 }, (_, offset) => ({
+        date: startOfDay(new Date(today.getTime() + (offset * MS_PER_DAY))),
+        tasks: [],
+      }));
+
+      sortedProjects.forEach((project) => {
+        if (project.remainingHours <= 0) {
+          return;
+        }
+
+        const windowEnd = schedule[schedule.length - 1].date;
+        const effectiveDeadline = project.deadlineDate < today ? today : project.deadlineDate;
+        const scheduleEnd = effectiveDeadline < windowEnd ? effectiveDeadline : windowEnd;
+        const eligibleDays = schedule.filter((day) => day.date >= today && day.date <= scheduleEnd);
+
+        if (!eligibleDays.length) {
+          return;
+        }
+
+        const openSteps = project.steps.filter((step) => !step.completed);
+        const fallbackSteps = openSteps.length
+          ? openSteps
+          : [{ id: `${project.id}-remaining`, desc: "General project work", time: project.totalHours, completed: false }];
+        const totalOpenWeight = fallbackSteps.reduce((sum, step) => sum + (step.time || 1), 0) || fallbackSteps.length;
+
+        const stepTargets = fallbackSteps.map((step, index) => {
+          const rawTarget = project.remainingHours * ((step.time || 1) / totalOpenWeight);
+          return {
+            stepId: step.id,
+            desc: step.desc,
+            rawTarget,
+            roundedTarget: 0,
+            remainder: 0,
+            index,
+          };
+        });
+
+        let assignedHours = 0;
+        stepTargets.forEach((target) => {
+          target.roundedTarget = Math.floor(target.rawTarget * 100) / 100;
+          target.remainder = target.rawTarget - target.roundedTarget;
+          assignedHours += target.roundedTarget;
+        });
+
+        let difference = Math.round((project.remainingHours - assignedHours) * 100) / 100;
+        stepTargets
+          .sort((a, b) => b.remainder - a.remainder)
+          .forEach((target) => {
+            if (difference > 0) {
+              target.roundedTarget = roundHours(target.roundedTarget + Math.min(0.01, difference));
+              difference = roundHours(difference - 0.01);
+            }
+          });
+        stepTargets.sort((a, b) => a.index - b.index);
+
+        const dailyHours = distributeEvenly(project.remainingHours, eligibleDays.length);
+        const stepQueues = stepTargets.map((target) => ({ ...target, remaining: target.roundedTarget }));
+
+        eligibleDays.forEach((day, dayIndex) => {
+          let remainingForDay = dailyHours[dayIndex];
+
+          while (remainingForDay > 0.001) {
+            const nextStep = stepQueues.find((step) => step.remaining > 0.001);
+            if (!nextStep) {
+              break;
+            }
+
+            const allocation = Math.min(nextStep.remaining, remainingForDay);
+            day.tasks.push({
+              projectId: project.id,
+              stepId: nextStep.stepId,
+              label: `${project.name}: ${nextStep.desc}`,
+              hours: roundHours(allocation),
+              completed: project.steps.find((step) => step.id === nextStep.stepId)?.completed || false,
+            });
+
+            nextStep.remaining = roundHours(nextStep.remaining - allocation);
+            remainingForDay = roundHours(remainingForDay - allocation);
+          }
+        });
+      });
+
+      return schedule;
+    }
+
+    function distributeEvenly(totalHours, dayCount) {
+      const exactPerDay = totalHours / dayCount;
+      const allocations = Array.from({ length: dayCount }, () => Math.floor(exactPerDay * 100) / 100);
+      let assigned = allocations.reduce((sum, hours) => sum + hours, 0);
+      let remainder = Math.round((totalHours - assigned) * 100) / 100;
+      let index = 0;
+
+      while (remainder > 0.001) {
+        allocations[index] = roundHours(allocations[index] + Math.min(0.01, remainder));
+        remainder = roundHours(remainder - 0.01);
+        index = (index + 1) % allocations.length;
+      }
+
+      return allocations;
+    }
+
+    function toggleTask(projectId, stepId) {
+      const project = projects.find((item) => item.id === projectId);
+      if (!project) {
+        return;
+      }
+
+      const step = project.steps.find((item) => item.id === stepId);
+      if (!step) {
+        return;
+      }
+
+      step.completed = !step.completed;
+      renderCalendar();
     }
 
     function renderCalendar() {
@@ -254,70 +400,61 @@ while True:
       }
 
       const sortedProjects = prioritizeProjects();
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const totalRemaining = sortedProjects.reduce((sum, project) => sum + project.remainingHours, 0);
+      const upcomingProjects = sortedProjects.filter((project) => project.remainingHours > 0);
+      const schedule = buildSchedule(sortedProjects);
 
-      schedulerStatus.textContent = `${projects.length} project${projects.length === 1 ? "" : "s"} scheduled across the next 14 days.`;
+      schedulerStatus.textContent = `${projects.length} project${projects.length === 1 ? "" : "s"} scheduled with ${formatHours(roundHours(totalRemaining))} remaining hour${roundHours(totalRemaining) === 1 ? "" : "s"} spread across the next 14 days.`;
 
-      for (let i = 0; i < 14; i += 1) {
+      if (!upcomingProjects.length) {
+        const completeMessage = document.createElement("p");
+        completeMessage.className = "schedule-empty scheduler-form-full";
+        completeMessage.textContent = "All scheduled project time is already complete.";
+        calendarEl.appendChild(completeMessage);
+        return;
+      }
+
+      schedule.forEach((day) => {
         const dayEl = document.createElement("article");
         dayEl.className = "card schedule-day";
 
-        const date = new Date(today);
-        date.setDate(today.getDate() + i);
-
         const heading = document.createElement("strong");
         heading.className = "schedule-day-title";
-        heading.textContent = formatDate(date);
+        heading.textContent = formatDate(day.date);
         dayEl.appendChild(heading);
 
-        let hasTasks = false;
+        const totalDayHours = roundHours(day.tasks.reduce((sum, task) => sum + task.hours, 0));
+        const subheading = document.createElement("p");
+        subheading.className = "schedule-day-hours";
+        subheading.textContent = day.tasks.length
+          ? `${formatHours(totalDayHours)} hour${totalDayHours === 1 ? "" : "s"} planned`
+          : "No planned work.";
+        dayEl.appendChild(subheading);
 
-        sortedProjects.forEach((project) => {
-          if (!project.steps.length) {
-            return;
-          }
-
-          const step = project.steps.shift();
-          if (!step) {
-            return;
-          }
-
-          hasTasks = true;
-          const taskEl = document.createElement("button");
-          taskEl.type = "button";
-          taskEl.className = "task-pill";
-          taskEl.textContent = `${project.name}: ${step.desc} (${step.time}h)`;
-          taskEl.setAttribute("aria-pressed", String(step.completed));
-
-          taskEl.addEventListener("click", () => {
-            const originalProject = projects.find((item) => item.name === project.name && item.deadline === project.deadline);
-            if (!originalProject) {
-              return;
-            }
-
-            const originalStep = originalProject.steps[step.originalIndex];
-            originalStep.completed = !originalStep.completed;
-            taskEl.classList.toggle("completed", originalStep.completed);
-            taskEl.setAttribute("aria-pressed", String(originalStep.completed));
-          });
-
-          if (step.completed) {
-            taskEl.classList.add("completed");
-          }
-
-          dayEl.appendChild(taskEl);
-        });
-
-        if (!hasTasks) {
+        if (!day.tasks.length) {
           const emptyState = document.createElement("p");
           emptyState.className = "schedule-empty";
           emptyState.textContent = "No scheduled steps.";
           dayEl.appendChild(emptyState);
+        } else {
+          day.tasks.forEach((task) => {
+            const taskEl = document.createElement("button");
+            taskEl.type = "button";
+            taskEl.className = "task-pill";
+            taskEl.textContent = `${task.label} (${formatHours(task.hours)}h)`;
+            taskEl.setAttribute("aria-pressed", String(task.completed));
+            taskEl.addEventListener("click", () => toggleTask(task.projectId, task.stepId));
+
+            if (task.completed) {
+              taskEl.classList.add("completed");
+            }
+
+            dayEl.appendChild(taskEl);
+          });
         }
 
         calendarEl.appendChild(dayEl);
-      }
+      });
     }
   </script>
 
