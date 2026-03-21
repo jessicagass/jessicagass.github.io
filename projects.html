@@ -4,63 +4,64 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jessica Gass | Projects</title>
-  <!-- Your GitHub CSS will handle styling -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- Nav Bar -->
+  <!-- Navbar -->
   <header>
     <nav class="navbar">
-        <h1 class="logo">Jessica Gass</h1>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="research.html">Research</a></li>
-            <li><a href="projects.html">Projects</a></li>
-            <li><a href="#">Contact</a></li>
-        </ul>
+      <h1 class="logo">Jessica Gass</h1>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="research.html">Research</a></li>
+        <li><a href="projects.html" class="active">Projects</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
     </nav>
   </header>
 
+  <!-- Main Section -->
   <main>
-    <h2>My Projects</h2>
-    <div class="projects-grid">
+    <section class="highlights">
+      <h2>My Projects</h2>
+      <div class="cards">
 
-      <!-- Project 1 -->
-      <div class="project-card">
-        <img src="6b8ed1a8-3fb6-447f-8311-9deac7ba0349.png" alt="Outlook Scheduler">
-        <h3>Outlook Recurring Email Scheduler</h3>
-        <p>
-          A Python script that automatically sends recurring emails through Outlook at scheduled times.
-          Uses <code>pywin32</code> and <code>schedule</code> for automation.
-        </p>
-        <a id="download-btn" href="#">Download Code</a>
+        <!-- Project 1 -->
+        <div class="card">
+          <img src="6b8ed1a8-3fb6-447f-8311-9deac7ba0349.png" alt="Outlook Scheduler Screenshot" style="width:100%; border-radius:5px;">
+          <h3>Outlook Recurring Email Scheduler</h3>
+          <p>
+            A Python script that automatically sends recurring emails through Outlook at scheduled times.
+            Uses <code>pywin32</code> and <code>schedule</code> for automation.
+          </p>
+          <button class="button" id="download-btn">Download Code</button>
 
-        <h4>Instructions for Full Automation</h4>
-        <div class="instructions">
-To make this fully automated using Windows Task Scheduler:
-
-1. Open Task Scheduler
-2. Create Basic Task
-3. Trigger: At log on or Daily
-4. Action: Start a Program
-5. Program: python.exe
-6. Arguments: "C:\path\to\outlook_scheduler.py"
-7. Start in: C:\path\to\
+          <h4>Instructions for Full Automation</h4>
+          <ol class="instructions" style="text-align:left; padding-left:20px;">
+            <li>Open Task Scheduler</li>
+            <li>Create Basic Task</li>
+            <li>Trigger: At log on or Daily</li>
+            <li>Action: Start a Program</li>
+            <li>Program: python.exe</li>
+            <li>Arguments: <code>C:\path\to\outlook_scheduler.py</code></li>
+            <li>Start in: <code>C:\path\to\</code></li>
+          </ol>
         </div>
-      </div>
 
-      <!-- Example Project 2 -->
-      <div class="project-card">
-        <img src="project2-image.png" alt="Project 2">
-        <h3>Project Title 2</h3>
-        <p>Brief description of project 2.</p>
-        <a href="https://github.com/username/project2" target="_blank">View on GitHub</a>
-      </div>
+        <!-- Project 2 -->
+        <div class="card">
+          <img src="project2-image.png" alt="Project 2 Screenshot" style="width:100%; border-radius:5px;">
+          <h3>Project Title 2</h3>
+          <p>Brief description of project 2.</p>
+          <a href="https://github.com/username/project2" target="_blank" class="button">View on GitHub</a>
+        </div>
 
-    </div>
+      </div>
+    </section>
   </main>
 
+  <!-- Footer -->
   <footer>
     &copy; 2026 Jessica Gass | Designed for GitHub Pages
   </footer>
