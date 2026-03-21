@@ -162,6 +162,18 @@ section h2 {
   font-size: 1.02rem;
 }
 
+.page-hero h2 {
+  max-width: 18ch;
+}
+
+.page-hero p {
+  max-width: 78ch;
+}
+
+.tight-follow {
+  padding-top: 3.5rem;
+}
+
 .hero-actions,
 .inline-actions {
   display: flex;
