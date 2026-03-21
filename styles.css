@@ -554,3 +554,33 @@ footer {
 .schedule-notes li {
   margin: 0;
 }
+
+
+.scheduler-settings {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-alt);
+}
+
+.scheduler-settings h3 {
+  margin: 0;
+  color: var(--primary-dark);
+}
+
+.scheduler-settings-copy {
+  margin: 0.35rem 0 1rem;
+  color: var(--muted);
+}
+
+.scheduler-settings-form {
+  margin-top: 1rem;
+}
+
+.schedule-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}

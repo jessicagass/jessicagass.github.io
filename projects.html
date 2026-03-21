@@ -86,6 +86,24 @@
             </p>
           </div>
 
+          <div class="scheduler-settings" aria-labelledby="scheduler-settings-title">
+            <div>
+              <h3 id="scheduler-settings-title">Shared availability settings</h3>
+              <p class="scheduler-settings-copy">Set these once and they will apply to every project you add to the schedule.</p>
+            </div>
+            <form id="scheduleSettingsForm" class="scheduler-form scheduler-settings-form">
+              <label>Rest Days (comma separated weekdays)
+                <input type="text" id="restDays" name="restDays" placeholder="Saturday, Sunday">
+              </label>
+              <label>Meeting-Heavy Days (comma separated weekdays)
+                <input type="text" id="meetingDays" name="meetingDays" placeholder="Monday, Wednesday">
+              </label>
+              <div class="inline-actions scheduler-form-full">
+                <button type="submit" class="button-secondary">Save Availability</button>
+              </div>
+            </form>
+          </div>
+
           <form id="projectForm" class="scheduler-form">
             <label>Project Name
               <input type="text" id="projectName" name="projectName" required>
@@ -105,12 +123,6 @@
             <label class="scheduler-form-full">Optional Steps (comma separated, format Step:hours)
               <input type="text" id="steps" name="steps" placeholder="Research:4, Draft:6, Revise:2">
             </label>
-            <label class="scheduler-form-full">Rest Days (comma separated weekdays)
-              <input type="text" id="restDays" name="restDays" placeholder="Saturday, Sunday">
-            </label>
-            <label class="scheduler-form-full">Meeting-Heavy Days (comma separated weekdays)
-              <input type="text" id="meetingDays" name="meetingDays" placeholder="Monday, Wednesday">
-            </label>
             <div class="inline-actions scheduler-form-full">
               <button type="submit" class="button">Add Project</button>
             </div>
@@ -119,6 +131,11 @@
           <div class="scheduler-legend scheduler-form-full" aria-label="Scheduler day weights">
             <span><strong>Rest days:</strong> no new work is assigned.</span>
             <span><strong>Meeting-heavy days:</strong> lighter workloads receive about half-capacity assignments.</span>
+          </div>
+
+          <div class="schedule-actions">
+            <button type="button" class="button-secondary" id="saveScheduleBtn">Save Schedule</button>
+            <button type="button" class="button-secondary" id="downloadScheduleBtn">Download Schedule</button>
           </div>
 
           <div id="schedulerStatus" class="scheduler-status" aria-live="polite">
@@ -169,8 +186,21 @@ while True:
     time.sleep(30)
     `;
 
+    const STORAGE_KEY = "jessica-project-scheduler";
+    const DEFAULT_SETTINGS = {
+      restDaysInput: "",
+      meetingDaysInput: "",
+      restDays: [],
+      meetingDays: [],
+    };
+
     const downloadBtn = document.getElementById("download-btn");
     const projectForm = document.getElementById("projectForm");
+    const scheduleSettingsForm = document.getElementById("scheduleSettingsForm");
+    const restDaysInput = document.getElementById("restDays");
+    const meetingDaysInput = document.getElementById("meetingDays");
+    const saveScheduleBtn = document.getElementById("saveScheduleBtn");
+    const downloadScheduleBtn = document.getElementById("downloadScheduleBtn");
     const calendarEl = document.getElementById("calendar");
     const schedulerStatus = document.getElementById("schedulerStatus");
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
@@ -194,6 +224,9 @@ while True:
     };
 
     let projects = [];
+    let scheduleSettings = { ...DEFAULT_SETTINGS };
+    let latestSchedule = [];
+    let latestSummary = null;
 
     downloadBtn.addEventListener("click", () => {
       const blob = new Blob([code], { type: "text/x-python" });
@@ -207,6 +240,13 @@ while True:
       URL.revokeObjectURL(url);
     });
 
+    scheduleSettingsForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      applySettingsFromInputs();
+      persistSchedulerState();
+      renderCalendar();
+    });
+
     projectForm.addEventListener("submit", (event) => {
       event.preventDefault();
 
@@ -216,11 +256,7 @@ while True:
       const importance = Number(document.getElementById("importance").value);
       const totalHours = Number(document.getElementById("totalHours").value);
       const stepsInput = document.getElementById("steps").value.trim();
-      const restDaysInput = document.getElementById("restDays").value.trim();
-      const meetingDaysInput = document.getElementById("meetingDays").value.trim();
       const parsedSteps = parseSteps(stepsInput, totalHours);
-      const restDays = parseWeekdays(restDaysInput);
-      const meetingDays = parseWeekdays(meetingDaysInput).filter((day) => !restDays.includes(day));
 
       projects.push({
         id: crypto.randomUUID(),
@@ -230,12 +266,27 @@ while True:
         importance,
         totalHours,
         steps: parsedSteps,
-        restDays,
-        meetingDays,
       });
 
       projectForm.reset();
+      persistSchedulerState();
       renderCalendar();
+    });
+
+    saveScheduleBtn.addEventListener("click", () => {
+      persistSchedulerState();
+      renderCalendar("Schedule saved in this browser.");
+    });
+
+    downloadScheduleBtn.addEventListener("click", () => {
+      if (!latestSchedule.length || !latestSummary) {
+        renderCalendar("Add at least one project before downloading the schedule.");
+        return;
+      }
+
+      persistSchedulerState();
+      downloadScheduleFile();
+      renderCalendar("Schedule downloaded successfully.");
     });
 
     function parseWeekdays(value) {
@@ -247,6 +298,19 @@ while True:
         .split(",")
         .map((entry) => WEEKDAY_INDEX[entry.trim().toLowerCase()])
         .filter((day) => Number.isInteger(day)))];
+    }
+
+    function applySettingsFromInputs() {
+      const normalizedRestDays = parseWeekdays(restDaysInput.value.trim());
+      const normalizedMeetingDays = parseWeekdays(meetingDaysInput.value.trim())
+        .filter((day) => !normalizedRestDays.includes(day));
+
+      scheduleSettings = {
+        restDaysInput: restDaysInput.value.trim(),
+        meetingDaysInput: meetingDaysInput.value.trim(),
+        restDays: normalizedRestDays,
+        meetingDays: normalizedMeetingDays,
+      };
     }
 
     function parseSteps(stepsInput, totalHours) {
@@ -286,7 +350,7 @@ while True:
           const completionBoost = 1 + (project.stage / 100);
           const urgencyDays = Math.max(Math.ceil((deadlineDate - today) / MS_PER_DAY) + 1, 1);
           const urgencyBoost = 1 / urgencyDays;
-          const availableDays = buildEligibleDays(today, deadlineDate, project).filter((day) => day.weight > 0);
+          const availableDays = buildEligibleDays(today, deadlineDate).filter((day) => day.weight > 0);
           const availableWeight = roundHours(availableDays.reduce((sum, day) => sum + day.weight, 0));
           const capacityPressure = availableWeight > 0 ? remainingHours / availableWeight : Number.POSITIVE_INFINITY;
           const priorityScore = roundHours(
@@ -309,15 +373,15 @@ while True:
         .sort((a, b) => b.priorityScore - a.priorityScore);
     }
 
-    function buildEligibleDays(today, deadlineDate, project) {
+    function buildEligibleDays(today, deadlineDate) {
       const effectiveDeadline = deadlineDate < today ? today : deadlineDate;
       const days = [];
 
       for (let cursor = new Date(today); cursor <= effectiveDeadline; cursor = new Date(cursor.getTime() + MS_PER_DAY)) {
         const date = startOfDay(cursor);
         const weekday = date.getDay();
-        const isRestDay = project.restDays.includes(weekday);
-        const isMeetingDay = !isRestDay && project.meetingDays.includes(weekday);
+        const isRestDay = scheduleSettings.restDays.includes(weekday);
+        const isMeetingDay = !isRestDay && scheduleSettings.meetingDays.includes(weekday);
 
         days.push({
           date,
@@ -371,7 +435,7 @@ while True:
 
         const scheduleByDay = new Map(schedule.map((day) => [day.date.getTime(), day]));
         const weightedDays = project.availableDays.filter((day) => day.weight > 0 && scheduleByDay.has(day.date.getTime()));
-        const allVisibleDays = project.availableDays.filter((day) => scheduleByDay.has(day.date.getTime()));
+        const allVisibleDays = buildEligibleDays(today, project.deadlineDate).filter((day) => scheduleByDay.has(day.date.getTime()));
 
         allVisibleDays.forEach((day) => {
           const target = scheduleByDay.get(day.date.getTime());
@@ -379,10 +443,10 @@ while True:
             return;
           }
 
-          if (day.isRestDay && !target.notes.includes(`${project.name}: Rest day`)) {
-            target.notes.push(`${project.name}: Rest day`);
-          } else if (day.isMeetingDay && !target.notes.includes(`${project.name}: Meeting-heavy day`)) {
-            target.notes.push(`${project.name}: Meeting-heavy day`);
+          if (day.isRestDay && !target.notes.includes("Rest day")) {
+            target.notes.push("Rest day");
+          } else if (day.isMeetingDay && !target.notes.includes("Meeting-heavy day")) {
+            target.notes.push("Meeting-heavy day");
           }
         });
 
@@ -509,23 +573,41 @@ while True:
       }
 
       step.completed = !step.completed;
+      persistSchedulerState();
       renderCalendar();
     }
 
-    function renderCalendar() {
+    function buildStatusMessage(summary, flashMessage = "") {
+      const baseMessage = summary
+        ? `${summary.projectCount} project${summary.projectCount === 1 ? "" : "s"} scheduled with ${formatHours(summary.totalRemaining)} remaining hour${summary.totalRemaining === 1 ? "" : "s"} planned before each deadline. ${summary.constrainedProjects.length ? `${summary.constrainedProjects.length} project${summary.constrainedProjects.length === 1 ? " is" : "s are"} capacity-constrained by meeting-heavy or rest-day settings.` : ""}`.trim()
+        : "Add a project to generate a two-week task schedule.";
+
+      return flashMessage ? `${flashMessage} ${baseMessage}` : baseMessage;
+    }
+
+    function renderCalendar(flashMessage = "") {
       calendarEl.innerHTML = "";
 
       if (!projects.length) {
-        schedulerStatus.textContent = "Add a project to generate a two-week task schedule.";
+        latestSchedule = [];
+        latestSummary = null;
+        schedulerStatus.textContent = buildStatusMessage(null, flashMessage);
         return;
       }
 
       const sortedProjects = prioritizeProjects();
-      const totalRemaining = sortedProjects.reduce((sum, project) => sum + project.remainingHours, 0);
+      const totalRemaining = roundHours(sortedProjects.reduce((sum, project) => sum + project.remainingHours, 0));
       const schedule = buildSchedule(sortedProjects);
       const constrainedProjects = sortedProjects.filter((project) => project.availableWeight < project.remainingHours && project.remainingHours > 0);
 
-      schedulerStatus.textContent = `${projects.length} project${projects.length === 1 ? "" : "s"} scheduled with ${formatHours(roundHours(totalRemaining))} remaining hour${roundHours(totalRemaining) === 1 ? "" : "s"} planned before each deadline. ${constrainedProjects.length ? `${constrainedProjects.length} project${constrainedProjects.length === 1 ? " is" : "s are"} capacity-constrained by meeting-heavy or rest-day settings.` : ""}`.trim();
+      latestSchedule = schedule;
+      latestSummary = {
+        projectCount: projects.length,
+        totalRemaining,
+        constrainedProjects,
+      };
+
+      schedulerStatus.textContent = buildStatusMessage(latestSummary, flashMessage);
 
       schedule.forEach((day) => {
         const dayEl = document.createElement("article");
@@ -580,6 +662,89 @@ while True:
         calendarEl.appendChild(dayEl);
       });
     }
+
+    function persistSchedulerState() {
+      const state = {
+        settings: {
+          restDaysInput: scheduleSettings.restDaysInput,
+          meetingDaysInput: scheduleSettings.meetingDaysInput,
+        },
+        projects,
+      };
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function restoreSchedulerState() {
+      const savedState = localStorage.getItem(STORAGE_KEY);
+      if (!savedState) {
+        applySettingsFromInputs();
+        return;
+      }
+
+      try {
+        const parsedState = JSON.parse(savedState);
+        const savedSettings = parsedState.settings || {};
+        projects = Array.isArray(parsedState.projects) ? parsedState.projects : [];
+        restDaysInput.value = savedSettings.restDaysInput || "";
+        meetingDaysInput.value = savedSettings.meetingDaysInput || "";
+        applySettingsFromInputs();
+      } catch (error) {
+        projects = [];
+        restDaysInput.value = "";
+        meetingDaysInput.value = "";
+        applySettingsFromInputs();
+      }
+    }
+
+    function buildDownloadContents() {
+      const availability = [
+        `Rest days: ${scheduleSettings.restDaysInput || "None"}`,
+        `Meeting-heavy days: ${scheduleSettings.meetingDaysInput || "None"}`,
+      ];
+
+      const projectSummary = projects.length
+        ? projects.map((project) => `- ${project.name} | deadline ${project.deadline} | ${formatHours(roundHours(project.totalHours * ((100 - project.stage) / 100)))}h remaining`).join("\n")
+        : "No projects saved.";
+
+      const scheduleLines = latestSchedule.map((day) => {
+        const taskLines = day.tasks.length
+          ? day.tasks.map((task) => `  - ${task.label} (${formatHours(task.hours)}h${task.completed ? ", completed" : ""})`).join("\n")
+          : "  - No scheduled steps.";
+        const noteLines = day.notes.length
+          ? `\n  Notes: ${day.notes.join("; ")}`
+          : "";
+
+        return `${formatDate(day.date)}\n${taskLines}${noteLines}`;
+      }).join("\n\n");
+
+      return [
+        "Jessica Gass Project Schedule",
+        "",
+        ...availability,
+        "",
+        "Projects:",
+        projectSummary,
+        "",
+        "Two-week schedule:",
+        scheduleLines,
+      ].join("\n");
+    }
+
+    function downloadScheduleFile() {
+      const blob = new Blob([buildDownloadContents()], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "project-schedule.txt";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    restoreSchedulerState();
+    renderCalendar(projects.length ? "Saved schedule restored." : "");
   </script>
 
 </body>
