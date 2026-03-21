@@ -105,10 +105,21 @@
             <label class="scheduler-form-full">Optional Steps (comma separated, format Step:hours)
               <input type="text" id="steps" name="steps" placeholder="Research:4, Draft:6, Revise:2">
             </label>
+            <label class="scheduler-form-full">Rest Days (comma separated weekdays)
+              <input type="text" id="restDays" name="restDays" placeholder="Saturday, Sunday">
+            </label>
+            <label class="scheduler-form-full">Meeting-Heavy Days (comma separated weekdays)
+              <input type="text" id="meetingDays" name="meetingDays" placeholder="Monday, Wednesday">
+            </label>
             <div class="inline-actions scheduler-form-full">
               <button type="submit" class="button">Add Project</button>
             </div>
           </form>
+
+          <div class="scheduler-legend scheduler-form-full" aria-label="Scheduler day weights">
+            <span><strong>Rest days:</strong> no new work is assigned.</span>
+            <span><strong>Meeting-heavy days:</strong> lighter workloads receive about half-capacity assignments.</span>
+          </div>
 
           <div id="schedulerStatus" class="scheduler-status" aria-live="polite">
             Add a project to generate a two-week task schedule.
@@ -163,6 +174,24 @@ while True:
     const calendarEl = document.getElementById("calendar");
     const schedulerStatus = document.getElementById("schedulerStatus");
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
+    const WEEKDAY_INDEX = {
+      sunday: 0,
+      sun: 0,
+      monday: 1,
+      mon: 1,
+      tuesday: 2,
+      tue: 2,
+      tues: 2,
+      wednesday: 3,
+      wed: 3,
+      thursday: 4,
+      thu: 4,
+      thurs: 4,
+      friday: 5,
+      fri: 5,
+      saturday: 6,
+      sat: 6,
+    };
 
     let projects = [];
 
@@ -187,7 +216,11 @@ while True:
       const importance = Number(document.getElementById("importance").value);
       const totalHours = Number(document.getElementById("totalHours").value);
       const stepsInput = document.getElementById("steps").value.trim();
+      const restDaysInput = document.getElementById("restDays").value.trim();
+      const meetingDaysInput = document.getElementById("meetingDays").value.trim();
       const parsedSteps = parseSteps(stepsInput, totalHours);
+      const restDays = parseWeekdays(restDaysInput);
+      const meetingDays = parseWeekdays(meetingDaysInput).filter((day) => !restDays.includes(day));
 
       projects.push({
         id: crypto.randomUUID(),
@@ -197,11 +230,24 @@ while True:
         importance,
         totalHours,
         steps: parsedSteps,
+        restDays,
+        meetingDays,
       });
 
       projectForm.reset();
       renderCalendar();
     });
+
+    function parseWeekdays(value) {
+      if (!value) {
+        return [];
+      }
+
+      return [...new Set(value
+        .split(",")
+        .map((entry) => WEEKDAY_INDEX[entry.trim().toLowerCase()])
+        .filter((day) => Number.isInteger(day)))];
+    }
 
     function parseSteps(stepsInput, totalHours) {
       if (!stepsInput) {
@@ -236,19 +282,52 @@ while True:
       return projects
         .map((project) => {
           const deadlineDate = startOfDay(new Date(`${project.deadline}T00:00:00`));
-          const daysLeft = Math.max(Math.ceil((deadlineDate - today) / MS_PER_DAY) + 1, 1);
           const remainingHours = roundHours(project.totalHours * ((100 - project.stage) / 100));
-          const priorityScore = ((remainingHours || 0.25) / daysLeft) * project.importance;
+          const completionBoost = 1 + (project.stage / 100);
+          const urgencyDays = Math.max(Math.ceil((deadlineDate - today) / MS_PER_DAY) + 1, 1);
+          const urgencyBoost = 1 / urgencyDays;
+          const availableDays = buildEligibleDays(today, deadlineDate, project).filter((day) => day.weight > 0);
+          const availableWeight = roundHours(availableDays.reduce((sum, day) => sum + day.weight, 0));
+          const capacityPressure = availableWeight > 0 ? remainingHours / availableWeight : Number.POSITIVE_INFINITY;
+          const priorityScore = roundHours(
+            (project.importance * 5) +
+            (completionBoost * 4) +
+            (urgencyBoost * 30) +
+            (capacityPressure * 6)
+          );
 
           return {
             ...project,
             deadlineDate,
-            daysLeft,
+            urgencyDays,
             remainingHours,
+            availableDays,
+            availableWeight,
             priorityScore,
           };
         })
         .sort((a, b) => b.priorityScore - a.priorityScore);
+    }
+
+    function buildEligibleDays(today, deadlineDate, project) {
+      const effectiveDeadline = deadlineDate < today ? today : deadlineDate;
+      const days = [];
+
+      for (let cursor = new Date(today); cursor <= effectiveDeadline; cursor = new Date(cursor.getTime() + MS_PER_DAY)) {
+        const date = startOfDay(cursor);
+        const weekday = date.getDay();
+        const isRestDay = project.restDays.includes(weekday);
+        const isMeetingDay = !isRestDay && project.meetingDays.includes(weekday);
+
+        days.push({
+          date,
+          weight: isRestDay ? 0 : isMeetingDay ? 0.5 : 1,
+          isRestDay,
+          isMeetingDay,
+        });
+      }
+
+      return days;
     }
 
     function startOfDay(date) {
@@ -278,6 +357,7 @@ while True:
       const schedule = Array.from({ length: 14 }, (_, offset) => ({
         date: startOfDay(new Date(today.getTime() + (offset * MS_PER_DAY))),
         tasks: [],
+        notes: [],
       }));
 
       sortedProjects.forEach((project) => {
@@ -285,12 +365,33 @@ while True:
           return;
         }
 
-        const windowEnd = schedule[schedule.length - 1].date;
-        const effectiveDeadline = project.deadlineDate < today ? today : project.deadlineDate;
-        const scheduleEnd = effectiveDeadline < windowEnd ? effectiveDeadline : windowEnd;
-        const eligibleDays = schedule.filter((day) => day.date >= today && day.date <= scheduleEnd);
+        if (!project.availableDays.length) {
+          return;
+        }
 
-        if (!eligibleDays.length) {
+        const scheduleByDay = new Map(schedule.map((day) => [day.date.getTime(), day]));
+        const weightedDays = project.availableDays.filter((day) => day.weight > 0 && scheduleByDay.has(day.date.getTime()));
+        const allVisibleDays = project.availableDays.filter((day) => scheduleByDay.has(day.date.getTime()));
+
+        allVisibleDays.forEach((day) => {
+          const target = scheduleByDay.get(day.date.getTime());
+          if (!target) {
+            return;
+          }
+
+          if (day.isRestDay && !target.notes.includes(`${project.name}: Rest day`)) {
+            target.notes.push(`${project.name}: Rest day`);
+          } else if (day.isMeetingDay && !target.notes.includes(`${project.name}: Meeting-heavy day`)) {
+            target.notes.push(`${project.name}: Meeting-heavy day`);
+          }
+        });
+
+        if (!weightedDays.length) {
+          const lastVisibleDay = allVisibleDays[allVisibleDays.length - 1];
+          if (lastVisibleDay) {
+            const target = scheduleByDay.get(lastVisibleDay.date.getTime());
+            target?.notes.push(`${project.name}: No working time available before the deadline.`);
+          }
           return;
         }
 
@@ -300,41 +401,29 @@ while True:
           : [{ id: `${project.id}-remaining`, desc: "General project work", time: project.totalHours, completed: false }];
         const totalOpenWeight = fallbackSteps.reduce((sum, step) => sum + (step.time || 1), 0) || fallbackSteps.length;
 
-        const stepTargets = fallbackSteps.map((step, index) => {
-          const rawTarget = project.remainingHours * ((step.time || 1) / totalOpenWeight);
-          return {
-            stepId: step.id,
-            desc: step.desc,
-            rawTarget,
-            roundedTarget: 0,
-            remainder: 0,
-            index,
-          };
-        });
+        const stepQueues = fallbackSteps.map((step) => ({
+          stepId: step.id,
+          desc: step.desc,
+          remaining: roundHours(project.remainingHours * ((step.time || 1) / totalOpenWeight)),
+          completed: step.completed,
+        }));
 
-        let assignedHours = 0;
-        stepTargets.forEach((target) => {
-          target.roundedTarget = Math.floor(target.rawTarget * 100) / 100;
-          target.remainder = target.rawTarget - target.roundedTarget;
-          assignedHours += target.roundedTarget;
-        });
+        normalizeStepQueue(stepQueues, project.remainingHours);
 
-        let difference = Math.round((project.remainingHours - assignedHours) * 100) / 100;
-        stepTargets
-          .sort((a, b) => b.remainder - a.remainder)
-          .forEach((target) => {
-            if (difference > 0) {
-              target.roundedTarget = roundHours(target.roundedTarget + Math.min(0.01, difference));
-              difference = roundHours(difference - 0.01);
-            }
-          });
-        stepTargets.sort((a, b) => a.index - b.index);
+        const totalWeight = weightedDays.reduce((sum, day) => sum + day.weight, 0);
+        const dayAllocations = weightedDays.map((day) => ({
+          ...day,
+          plannedHours: roundHours((project.remainingHours * day.weight) / totalWeight),
+        }));
+        normalizeDayAllocations(dayAllocations, project.remainingHours);
 
-        const dailyHours = distributeEvenly(project.remainingHours, eligibleDays.length);
-        const stepQueues = stepTargets.map((target) => ({ ...target, remaining: target.roundedTarget }));
+        dayAllocations.forEach((day) => {
+          const scheduleDay = scheduleByDay.get(day.date.getTime());
+          if (!scheduleDay || day.plannedHours <= 0) {
+            return;
+          }
 
-        eligibleDays.forEach((day, dayIndex) => {
-          let remainingForDay = dailyHours[dayIndex];
+          let remainingForDay = day.plannedHours;
 
           while (remainingForDay > 0.001) {
             const nextStep = stepQueues.find((step) => step.remaining > 0.001);
@@ -342,38 +431,70 @@ while True:
               break;
             }
 
-            const allocation = Math.min(nextStep.remaining, remainingForDay);
-            day.tasks.push({
+            const allocation = roundHours(Math.min(nextStep.remaining, remainingForDay));
+            scheduleDay.tasks.push({
               projectId: project.id,
               stepId: nextStep.stepId,
               label: `${project.name}: ${nextStep.desc}`,
-              hours: roundHours(allocation),
-              completed: project.steps.find((step) => step.id === nextStep.stepId)?.completed || false,
+              hours: allocation,
+              completed: nextStep.completed,
             });
 
             nextStep.remaining = roundHours(nextStep.remaining - allocation);
             remainingForDay = roundHours(remainingForDay - allocation);
           }
         });
+
+        const remainingUnscheduled = roundHours(stepQueues.reduce((sum, step) => sum + step.remaining, 0));
+        if (remainingUnscheduled > 0.001) {
+          const finalDay = scheduleByDay.get(weightedDays[weightedDays.length - 1].date.getTime());
+          finalDay?.notes.push(`${project.name}: ${formatHours(remainingUnscheduled)}h could not be scheduled before the deadline.`);
+        }
       });
 
       return schedule;
     }
 
-    function distributeEvenly(totalHours, dayCount) {
-      const exactPerDay = totalHours / dayCount;
-      const allocations = Array.from({ length: dayCount }, () => Math.floor(exactPerDay * 100) / 100);
-      let assigned = allocations.reduce((sum, hours) => sum + hours, 0);
-      let remainder = Math.round((totalHours - assigned) * 100) / 100;
+    function normalizeStepQueue(stepQueues, targetHours) {
+      const assigned = roundHours(stepQueues.reduce((sum, step) => sum + step.remaining, 0));
+      let delta = roundHours(targetHours - assigned);
       let index = 0;
 
-      while (remainder > 0.001) {
-        allocations[index] = roundHours(allocations[index] + Math.min(0.01, remainder));
-        remainder = roundHours(remainder - 0.01);
-        index = (index + 1) % allocations.length;
-      }
+      while (Math.abs(delta) > 0.001 && stepQueues.length) {
+        const step = stepQueues[index % stepQueues.length];
+        const adjustment = Math.min(0.01, Math.abs(delta));
 
-      return allocations;
+        if (delta > 0) {
+          step.remaining = roundHours(step.remaining + adjustment);
+          delta = roundHours(delta - adjustment);
+        } else if (step.remaining >= adjustment) {
+          step.remaining = roundHours(step.remaining - adjustment);
+          delta = roundHours(delta + adjustment);
+        }
+
+        index += 1;
+      }
+    }
+
+    function normalizeDayAllocations(dayAllocations, targetHours) {
+      const assigned = roundHours(dayAllocations.reduce((sum, day) => sum + day.plannedHours, 0));
+      let delta = roundHours(targetHours - assigned);
+      let index = 0;
+
+      while (Math.abs(delta) > 0.001 && dayAllocations.length) {
+        const day = dayAllocations[index % dayAllocations.length];
+        const adjustment = Math.min(0.01, Math.abs(delta));
+
+        if (delta > 0) {
+          day.plannedHours = roundHours(day.plannedHours + adjustment);
+          delta = roundHours(delta - adjustment);
+        } else if (day.plannedHours >= adjustment) {
+          day.plannedHours = roundHours(day.plannedHours - adjustment);
+          delta = roundHours(delta + adjustment);
+        }
+
+        index += 1;
+      }
     }
 
     function toggleTask(projectId, stepId) {
@@ -401,18 +522,10 @@ while True:
 
       const sortedProjects = prioritizeProjects();
       const totalRemaining = sortedProjects.reduce((sum, project) => sum + project.remainingHours, 0);
-      const upcomingProjects = sortedProjects.filter((project) => project.remainingHours > 0);
       const schedule = buildSchedule(sortedProjects);
+      const constrainedProjects = sortedProjects.filter((project) => project.availableWeight < project.remainingHours && project.remainingHours > 0);
 
-      schedulerStatus.textContent = `${projects.length} project${projects.length === 1 ? "" : "s"} scheduled with ${formatHours(roundHours(totalRemaining))} remaining hour${roundHours(totalRemaining) === 1 ? "" : "s"} spread across the next 14 days.`;
-
-      if (!upcomingProjects.length) {
-        const completeMessage = document.createElement("p");
-        completeMessage.className = "schedule-empty scheduler-form-full";
-        completeMessage.textContent = "All scheduled project time is already complete.";
-        calendarEl.appendChild(completeMessage);
-        return;
-      }
+      schedulerStatus.textContent = `${projects.length} project${projects.length === 1 ? "" : "s"} scheduled with ${formatHours(roundHours(totalRemaining))} remaining hour${roundHours(totalRemaining) === 1 ? "" : "s"} planned before each deadline. ${constrainedProjects.length ? `${constrainedProjects.length} project${constrainedProjects.length === 1 ? " is" : "s are"} capacity-constrained by meeting-heavy or rest-day settings.` : ""}`.trim();
 
       schedule.forEach((day) => {
         const dayEl = document.createElement("article");
@@ -430,6 +543,17 @@ while True:
           ? `${formatHours(totalDayHours)} hour${totalDayHours === 1 ? "" : "s"} planned`
           : "No planned work.";
         dayEl.appendChild(subheading);
+
+        if (day.notes.length) {
+          const notes = document.createElement("ul");
+          notes.className = "schedule-notes";
+          day.notes.forEach((note) => {
+            const item = document.createElement("li");
+            item.textContent = note;
+            notes.appendChild(item);
+          });
+          dayEl.appendChild(notes);
+        }
 
         if (!day.tasks.length) {
           const emptyState = document.createElement("p");

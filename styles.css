@@ -526,3 +526,31 @@ footer {
     min-height: 0;
   }
 }
+
+.scheduler-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1.25rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-alt);
+  color: var(--muted);
+}
+
+.scheduler-legend strong {
+  color: var(--primary-dark);
+}
+
+.schedule-notes {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+  color: var(--muted);
+  display: grid;
+  gap: 0.35rem;
+}
+
+.schedule-notes li {
+  margin: 0;
+}
