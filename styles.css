@@ -1,121 +1,105 @@
-/* Base */
+/* General Styles */
 body {
-    margin: 0;
-    font-family: "Georgia", "Times New Roman", serif;
-    color: #2f3e2f;
-    background-color: #ffffff;
-    line-height: 1.7;
+margin: 0;
+font-family: Arial, Helvetica, sans-serif;
+line-height: 1.6;
+color: #2f4f4f;
 }
 
 /* Navbar */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 60px;
-    background-color: #8fbc8f;
-    border-bottom: 1px solid #d6e6d6;
+display: flex;
+justify-content: space-between;
+align-items: center;
+background-color: #8fbc8f;
+padding: 15px 40px;
 }
 
 .logo {
-    margin: 0;
-    font-size: 1.5rem;
-    color: white;
-    font-weight: normal;
+margin: 0;
+color: white;
 }
 
 .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 25px;
+list-style: none;
+display: flex;
+gap: 20px;
 }
 
 .nav-links a {
-    text-decoration: none;
-    color: white;
-    font-size: 0.95rem;
+text-decoration: none;
+color: white;
+font-weight: bold;
 }
 
 .nav-links a:hover {
-    text-decoration: underline;
+text-decoration: underline;
 }
 
-/* Hero */
-<p><strong>Ph.D. Student, Industrial-Organizational Psychology</strong><br>
-Virginia Tech</p>
+/* Hero Section */
 .hero {
-    padding: 60px 20px 30px 20px;
-    text-align: center;
-    background-color: #f4f8f4;
+background-color: #e6f2e6;
+padding: 80px 40px;
+text-align: center;
 }
 
 .hero h2 {
-    font-size: 2rem;
-    font-weight: normal;
-    margin-bottom: 10px;
+font-size: 2.2rem;
 }
 
 .hero p {
-    max-width: 700px;
-    margin: 0 auto;
+max-width: 600px;
+margin: 20px auto;
+}
+
+.button {
+display: inline-block;
+padding: 10px 20px;
+background-color: #6b9e6b;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+}
+
+.button:hover {
+background-color: #5a8c5a;
 }
 
 /* Sections */
 section {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 40px 20px;
+padding: 60px 40px;
+text-align: center;
 }
 
-h2 {
-    font-weight: normal;
-    border-bottom: 1px solid #d6e6d6;
-    padding-bottom: 8px;
-    margin-bottom: 20px;
+.about {
+background-color: #f5faf5;
 }
 
-/* About */
-.about p {
-    text-align: left;
-}
-
-/* Research Areas (less “cardy”) */
 .highlights .cards {
-    display: block;
+display: flex;
+justify-content: center;
+gap: 20px;
+flex-wrap: wrap;
 }
 
 .card {
-    border: none;
-    border-bottom: 1px solid #e0ece0;
-    padding: 15px 0;
-    box-shadow: none;
-}
-
-.card h3 {
-    margin-bottom: 5px;
-    font-size: 1.1rem;
-}
-
-/* Lists (publications/presentations) */
-ul {
-    padding-left: 20px;
-}
-
-li {
-    margin-bottom: 12px;
+background-color: white;
+border: 1px solid #d0e0d0;
+border-radius: 10px;
+padding: 20px;
+width: 250px;
+box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 /* Contact */
 .contact {
-    border-top: 1px solid #d6e6d6;
-    margin-top: 40px;
+background-color: #e6f2e6;
 }
 
 /* Footer */
 footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #f4f8f4;
-    font-size: 0.9rem;
-    color: #555;
+background-color: #8fbc8f;
+color: white;
+text-align: center;
+padding: 15px;
 }
