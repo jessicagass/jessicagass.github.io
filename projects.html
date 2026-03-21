@@ -1,120 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jessica Gass | Projects</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+<div class="cards">
 
-  <!-- Navbar -->
-  <header>
-    <nav class="navbar">
-      <h1 class="logo">Jessica Gass</h1>
-      <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="research.html">Research</a></li>
-        <li><a href="projects.html" class="active">Projects</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
+  <!-- Project 1 -->
+  <div class="card" style="
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 25px;
+        box-sizing: border-box;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.6;
+        transition: transform 0.2s, box-shadow 0.2s;
+    "
+    onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.2)';"
+    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)';"
+  >
+    <h3>Outlook Recurring Email Scheduler</h3>
+    <p>
+      A Python script that automatically sends recurring emails through Outlook at scheduled times.
+      Uses <code>pywin32</code> and <code>schedule</code> for automation.
+    </p>
+    <button class="button" id="download-btn">Download Code</button>
 
-  <!-- Main Section -->
-  <main>
-    <section class="highlights">
-      <h2>My Projects</h2>
-      <div class="cards">
+    <h4>Instructions for Full Automation</h4>
+    <ol class="instructions" style="text-align:left; padding-left:20px;">
+      <li>Open Task Scheduler</li>
+      <li>Create Basic Task</li>
+      <li>Trigger: At log on or Daily</li>
+      <li>Action: Start a Program</li>
+      <li>Program: python.exe</li>
+      <li>Arguments: <code>C:\path\to\outlook_scheduler.py</code></li>
+      <li>Start in: <code>C:\path\to\</code></li>
+    </ol>
 
-        <!-- Project 1 -->
-        <div class="card">
-          <h3>Outlook Recurring Email Scheduler</h3>
-          <p>
-            A Python script that automatically sends recurring emails through Outlook at scheduled times.
-            Uses <code>pywin32</code> and <code>schedule</code> for automation.
-          </p>
-          <button class="button" id="download-btn">Download Code</button>
+    <h4>Scheduling Options & Adjustments</h4>
+    <p style="text-align:left; padding-left:20px;">
+      You can adjust when the script sends emails and to whom:
+    </p>
+    <ul style="text-align:left; padding-left:20px;">
+      <li><strong>Daily at 9:00 AM:</strong> <code>schedule.every().day.at("09:00").do(send_outlook_email)</code></li>
+      <li><strong>Weekly (Monday at 10:30):</strong> <code>schedule.every().monday.at("10:30").do(send_outlook_email)</code></li>
+      <li><strong>Every 2 hours:</strong> <code>schedule.every(2).hours.do(send_outlook_email)</code></li>
+      <li><strong>Multiple recipients:</strong> <code>mail.To = "a@example.com; b@example.com"</code></li>
+    </ul>
+  </div>
 
-          <h4>Instructions for Full Automation</h4>
-          <ol class="instructions" style="text-align:left; padding-left:20px;">
-            <li>Open Task Scheduler</li>
-            <li>Create Basic Task</li>
-            <li>Trigger: At log on or Daily</li>
-            <li>Action: Start a Program</li>
-            <li>Program: python.exe</li>
-            <li>Arguments: <code>C:\path\to\outlook_scheduler.py</code></li>
-            <li>Start in: <code>C:\path\to\</code></li>
-          </ol>
-
-          <h4>Scheduling Options & Adjustments</h4>
-          <p style="text-align:left; padding-left:20px;">
-            You can adjust when the script sends emails and to whom:
-          </p>
-          <ul style="text-align:left; padding-left:20px;">
-            <li><strong>Daily at 9:00 AM:</strong> <code>schedule.every().day.at("09:00").do(send_outlook_email)</code></li>
-            <li><strong>Weekly (Monday at 10:30):</strong> <code>schedule.every().monday.at("10:30").do(send_outlook_email)</code></li>
-            <li><strong>Every 2 hours:</strong> <code>schedule.every(2).hours.do(send_outlook_email)</code></li>
-            <li><strong>Multiple recipients:</strong> <code>mail.To = "a@example.com; b@example.com"</code></li>
-          </ul>
-        </div>
-
-      </div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    &copy; 2026 Jessica Gass | Designed for GitHub Pages
-  </footer>
-
-  <!-- JavaScript for downloading Project 1 Python code -->
-  <script>
-    const code = `
-python -m pip install pywin32 schedule
-import win32com.client
-import schedule
-import time
-from datetime import datetime
-
-def send_outlook_email():
-    try:
-        outlook = win32com.client.Dispatch("Outlook.Application")
-        mail = outlook.CreateItem(0)
-        mail.To = "recipient@example.com"
-        mail.CC = ""
-        mail.Subject = "Scheduled Outlook Email"
-        mail.Body = (
-            "Hello,\\n\\n"
-            "This is a recurring scheduled email sent via Python and Outlook.\\n\\n"
-            f"Sent at: {datetime.now()}\\n\\n"
-            "Best regards,"
-        )
-        mail.Send()
-        print(f"Email sent successfully at {datetime.now()}")
-    except Exception as e:
-        print("Error sending email:", e)
-
-schedule.every().day.at("09:00").do(send_outlook_email)
-print("Outlook email scheduler started...")
-while True:
-    schedule.run_pending()
-    time.sleep(30)
-    `;
-
-    const downloadBtn = document.getElementById("download-btn");
-    downloadBtn.addEventListener("click", () => {
-      const blob = new Blob([code], { type: "text/x-python" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "outlook_email_scheduler.py";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-  </script>
-
-</body>
-</html>
+</div>
