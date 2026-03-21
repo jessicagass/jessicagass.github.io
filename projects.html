@@ -16,7 +16,7 @@
         <li><a href="index.html">Home</a></li>
         <li><a href="research.html">Research</a></li>
         <li><a href="projects.html" class="active">Projects</a></li>
-        <li><a href="#">Contact</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
       </ul>
     </nav>
   </header>
@@ -36,25 +36,29 @@
           </p>
           <button class="button" id="download-btn">Download Code</button>
 
-          <h4>Instructions for Full Automation</h4>
-          <ol class="instructions">
-            <li>Open Task Scheduler</li>
-            <li>Create Basic Task</li>
-            <li>Trigger: At log on or Daily</li>
-            <li>Action: Start a Program</li>
-            <li>Program: python.exe</li>
-            <li>Arguments: <code>C:\path\to\outlook_scheduler.py</code></li>
-            <li>Start in: <code>C:\path\to\</code></li>
-          </ol>
+          <details class="project-details">
+            <summary>Instructions for Full Automation</summary>
+            <ol class="instructions">
+              <li>Open Task Scheduler</li>
+              <li>Create Basic Task</li>
+              <li>Trigger: At log on or Daily</li>
+              <li>Action: Start a Program</li>
+              <li>Program: python.exe</li>
+              <li>Arguments: <code>C:\path\to\outlook_scheduler.py</code></li>
+              <li>Start in: <code>C:\path\to\</code></li>
+            </ol>
+          </details>
 
-          <h4>Scheduling Options & Adjustments</h4>
-          <p>You can adjust when the script sends emails and to whom:</p>
-          <ul>
-            <li><strong>Daily at 9:00 AM:</strong> <code>schedule.every().day.at("09:00").do(send_outlook_email)</code></li>
-            <li><strong>Weekly (Monday at 10:30):</strong> <code>schedule.every().monday.at("10:30").do(send_outlook_email)</code></li>
-            <li><strong>Every 2 hours:</strong> <code>schedule.every(2).hours.do(send_outlook_email)</code></li>
-            <li><strong>Multiple recipients:</strong> <code>mail.To = "a@example.com; b@example.com"</code></li>
-          </ul>
+          <details class="project-details">
+            <summary>Scheduling Options & Adjustments</summary>
+            <p>You can adjust when the script sends emails and to whom:</p>
+            <ul>
+              <li><strong>Daily at 9:00 AM:</strong> <code>schedule.every().day.at("09:00").do(send_outlook_email)</code></li>
+              <li><strong>Weekly (Monday at 10:30):</strong> <code>schedule.every().monday.at("10:30").do(send_outlook_email)</code></li>
+              <li><strong>Every 2 hours:</strong> <code>schedule.every(2).hours.do(send_outlook_email)</code></li>
+              <li><strong>Multiple recipients:</strong> <code>mail.To = "a@example.com; b@example.com"</code></li>
+            </ul>
+          </details>
         </div>
 
       </div>

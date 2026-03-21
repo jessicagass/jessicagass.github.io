@@ -192,3 +192,40 @@ padding: 15px;
   display: inline-block;
   margin: 15px 0;
 }
+
+.project-details {
+  margin: 18px 0;
+  border: 1px solid #d0e0d0;
+  border-radius: 8px;
+  background-color: #f5faf5;
+  overflow: hidden;
+}
+
+.project-details summary {
+  cursor: pointer;
+  padding: 14px 18px;
+  font-weight: bold;
+  color: #2f4f4f;
+  list-style: none;
+}
+
+.project-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.project-details summary::after {
+  content: "+";
+  float: right;
+  font-size: 1.2rem;
+}
+
+.project-details[open] summary::after {
+  content: "−";
+}
+
+.project-details ol,
+.project-details p,
+.project-details ul {
+  margin: 0;
+  padding: 0 18px 18px;
+}
