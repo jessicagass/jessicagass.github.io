@@ -4,104 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jessica Gass | Projects</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f9;
-      color: #333;
-    }
-
-    header {
-      background-color: #1e3a8a;
-      color: white;
-      padding: 2rem 1rem;
-      text-align: center;
-    }
-
-    header h1 {
-      margin-bottom: 0.5rem;
-    }
-
-    header p {
-      opacity: 0.8;
-    }
-
-    main {
-      max-width: 1200px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 2rem;
-      color: #1e3a8a;
-    }
-
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .project-card {
-      background-color: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      padding: 1.5rem;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .project-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-
-    .project-card img {
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-    }
-
-    .project-card h3 {
-      margin-bottom: 0.5rem;
-      color: #1e3a8a;
-    }
-
-    .project-card p {
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
-    }
-
-    .project-card a {
-      text-decoration: none;
-      color: white;
-      background-color: #1e3a8a;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      transition: background-color 0.2s;
-    }
-
-    .project-card a:hover {
-      background-color: #3b5fd1;
-    }
-
-    footer {
-      text-align: center;
-      padding: 2rem 1rem;
-      margin-top: 3rem;
-      font-size: 0.9rem;
-      color: #666;
-    }
-
-  </style>
+  <!-- Your GitHub CSS will handle styling -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <!-- Nav Bar -->
   <header>
-    <h1>Jessica Gass</h1>
-    <p>Projects Portfolio</p>
+    <nav class="navbar">
+        <h1 class="logo">Jessica Gass</h1>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="research.html">Research</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </nav>
   </header>
 
   <main>
@@ -117,6 +35,19 @@
           Uses <code>pywin32</code> and <code>schedule</code> for automation.
         </p>
         <a id="download-btn" href="#">Download Code</a>
+
+        <h4>Instructions for Full Automation</h4>
+        <div class="instructions">
+To make this fully automated using Windows Task Scheduler:
+
+1. Open Task Scheduler
+2. Create Basic Task
+3. Trigger: At log on or Daily
+4. Action: Start a Program
+5. Program: python.exe
+6. Arguments: "C:\path\to\outlook_scheduler.py"
+7. Start in: C:\path\to\
+        </div>
       </div>
 
       <!-- Example Project 2 -->
@@ -134,8 +65,8 @@
     &copy; 2026 Jessica Gass | Designed for GitHub Pages
   </footer>
 
+  <!-- JavaScript for downloading Project 1 Python code -->
   <script>
-    // JavaScript to create a downloadable Python file
     const code = `
 python -m pip install pywin32 schedule
 import win32com.client
