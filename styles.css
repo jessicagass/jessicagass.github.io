@@ -489,8 +489,21 @@ footer {
   padding-top: 0;
 }
 
+.scheduler-card {
+  margin-top: 0;
+}
+
+.scheduler-card-body {
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+
 .scheduler-panel {
   padding: clamp(2rem, 4vw, 3rem);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
 }
 
 .scheduler-header {

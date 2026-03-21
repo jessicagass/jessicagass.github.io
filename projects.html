@@ -79,78 +79,87 @@
               </details>
             </div>
           </details>
-        </div>
-      </div>
-    </section>
-
-    <section id="project-scheduler" class="scheduler-section">
-      <div class="section-inner">
-        <div class="panel scheduler-panel">
-          <div class="scheduler-header">
-            <span class="eyebrow">Interactive Project Scheduler</span>
-            <h2>Build a balanced project plan</h2>
-            <p class="lead">
-              Enter a deadline, progress, and total hours to spread the remaining work as evenly as possible across the days leading up to the deadline. Detailed step entries are optional.
-            </p>
-          </div>
-
-          <div class="scheduler-settings" aria-labelledby="scheduler-settings-title">
-            <div>
-              <h3 id="scheduler-settings-title">Shared availability settings</h3>
-              <p class="scheduler-settings-copy">Set these once and they will apply to every project you add to the schedule.</p>
-            </div>
-            <form id="scheduleSettingsForm" class="scheduler-form scheduler-settings-form">
-              <label>Rest Days (comma separated weekdays)
-                <input type="text" id="restDays" name="restDays" placeholder="Saturday, Sunday">
-              </label>
-              <label>Meeting-Heavy Days (comma separated weekdays)
-                <input type="text" id="meetingDays" name="meetingDays" placeholder="Monday, Wednesday">
-              </label>
-              <div class="inline-actions scheduler-form-full">
-                <button type="submit" class="button-secondary">Save Availability</button>
+          <details class="card project-card scheduler-card">
+            <summary class="project-card-summary">
+              <div>
+                <h3>Interactive Project Scheduler</h3>
+                <p>
+                  A planning tool that turns deadlines, progress, and remaining hours into a balanced two-week work plan with optional task breakdowns and shared availability rules.
+                </p>
               </div>
-            </form>
-          </div>
+              <span class="project-card-toggle" aria-hidden="true">Expand project</span>
+            </summary>
 
-          <form id="projectForm" class="scheduler-form">
-            <label>Project Name
-              <input type="text" id="projectName" name="projectName" required>
-            </label>
-            <label>Stage (0-100%)
-              <input type="number" id="projectStage" name="projectStage" min="0" max="100" required>
-            </label>
-            <label>Deadline
-              <input type="date" id="deadline" name="deadline" required>
-            </label>
-            <label>Importance (1-5)
-              <input type="number" id="importance" name="importance" min="1" max="5" required>
-            </label>
-            <label>Total Project Time (hours)
-              <input type="number" id="totalHours" name="totalHours" min="0.5" step="0.5" required>
-            </label>
-            <label class="scheduler-form-full">Optional Steps (comma separated, format Step:hours)
-              <input type="text" id="steps" name="steps" placeholder="Research:4, Draft:6, Revise:2">
-            </label>
-            <div class="inline-actions scheduler-form-full">
-              <button type="submit" class="button">Add Project</button>
+            <div class="project-card-body scheduler-card-body">
+              <div id="project-scheduler" class="panel scheduler-panel">
+                <div class="scheduler-header">
+                  <span class="eyebrow">Project 2</span>
+                  <h2>Build a balanced project plan</h2>
+                  <p class="lead">
+                    Enter a deadline, progress, and total hours to spread the remaining work as evenly as possible across the days leading up to the deadline. Detailed step entries are optional.
+                  </p>
+                </div>
+
+                <div class="scheduler-settings" aria-labelledby="scheduler-settings-title">
+                  <div>
+                    <h3 id="scheduler-settings-title">Shared availability settings</h3>
+                    <p class="scheduler-settings-copy">Set these once and they will apply to every project you add to the schedule.</p>
+                  </div>
+                  <form id="scheduleSettingsForm" class="scheduler-form scheduler-settings-form">
+                    <label>Rest Days (comma separated weekdays)
+                      <input type="text" id="restDays" name="restDays" placeholder="Saturday, Sunday">
+                    </label>
+                    <label>Meeting-Heavy Days (comma separated weekdays)
+                      <input type="text" id="meetingDays" name="meetingDays" placeholder="Monday, Wednesday">
+                    </label>
+                    <div class="inline-actions scheduler-form-full">
+                      <button type="submit" class="button-secondary">Save Availability</button>
+                    </div>
+                  </form>
+                </div>
+
+                <form id="projectForm" class="scheduler-form">
+                  <label>Project Name
+                    <input type="text" id="projectName" name="projectName" required>
+                  </label>
+                  <label>Stage (0-100%)
+                    <input type="number" id="projectStage" name="projectStage" min="0" max="100" required>
+                  </label>
+                  <label>Deadline
+                    <input type="date" id="deadline" name="deadline" required>
+                  </label>
+                  <label>Importance (1-5)
+                    <input type="number" id="importance" name="importance" min="1" max="5" required>
+                  </label>
+                  <label>Total Project Time (hours)
+                    <input type="number" id="totalHours" name="totalHours" min="0.5" step="0.5" required>
+                  </label>
+                  <label class="scheduler-form-full">Optional Steps (comma separated, format Step:hours)
+                    <input type="text" id="steps" name="steps" placeholder="Research:4, Draft:6, Revise:2">
+                  </label>
+                  <div class="inline-actions scheduler-form-full">
+                    <button type="submit" class="button">Add Project</button>
+                  </div>
+                </form>
+
+                <div class="scheduler-legend scheduler-form-full" aria-label="Scheduler day weights">
+                  <span><strong>Rest days:</strong> no new work is assigned.</span>
+                  <span><strong>Meeting-heavy days:</strong> lighter workloads receive about half-capacity assignments.</span>
+                </div>
+
+                <div class="schedule-actions">
+                  <button type="button" class="button-secondary" id="saveScheduleBtn">Save Schedule</button>
+                  <button type="button" class="button-secondary" id="downloadScheduleBtn">Download Schedule</button>
+                  <button type="button" class="button-secondary" id="resetScheduleBtn">Reset Scheduler</button>
+                </div>
+
+                <div id="schedulerStatus" class="scheduler-status" aria-live="polite">
+                  Add a project to generate a two-week task schedule.
+                </div>
+                <div id="calendar" class="cards scheduler-calendar" aria-live="polite"></div>
+              </div>
             </div>
-          </form>
-
-          <div class="scheduler-legend scheduler-form-full" aria-label="Scheduler day weights">
-            <span><strong>Rest days:</strong> no new work is assigned.</span>
-            <span><strong>Meeting-heavy days:</strong> lighter workloads receive about half-capacity assignments.</span>
-          </div>
-
-          <div class="schedule-actions">
-            <button type="button" class="button-secondary" id="saveScheduleBtn">Save Schedule</button>
-            <button type="button" class="button-secondary" id="downloadScheduleBtn">Download Schedule</button>
-            <button type="button" class="button-secondary" id="resetScheduleBtn">Reset Scheduler</button>
-          </div>
-
-          <div id="schedulerStatus" class="scheduler-status" aria-live="polite">
-            Add a project to generate a two-week task schedule.
-          </div>
-          <div id="calendar" class="cards scheduler-calendar" aria-live="polite"></div>
+          </details>
         </div>
       </div>
     </section>
