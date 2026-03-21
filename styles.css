@@ -410,3 +410,111 @@ footer {
     padding: 0.55rem 0.75rem;
   }
 }
+
+.project-showcase {
+  align-items: stretch;
+}
+
+.feature-list {
+  margin-top: 1rem;
+}
+
+.scheduler-section {
+  padding-top: 0;
+}
+
+.scheduler-panel {
+  padding: clamp(2rem, 4vw, 3rem);
+}
+
+.scheduler-header {
+  margin-bottom: 1.75rem;
+}
+
+.scheduler-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.scheduler-form label {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+.scheduler-form input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.scheduler-form input:focus {
+  outline: 2px solid rgba(47, 107, 95, 0.18);
+  border-color: var(--primary);
+}
+
+.scheduler-form-full {
+  grid-column: 1 / -1;
+}
+
+.scheduler-status {
+  margin-top: 1.5rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.scheduler-calendar {
+  margin-top: 1.5rem;
+}
+
+.schedule-day {
+  min-height: 220px;
+}
+
+.schedule-day-title {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.task-pill {
+  width: 100%;
+  margin-top: 0.65rem;
+  padding: 0.8rem 0.9rem;
+  border: 0;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.task-pill:hover,
+.task-pill:focus-visible {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.task-pill.completed {
+  background: #5f716d;
+  text-decoration: line-through;
+}
+
+.schedule-empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+@media (max-width: 560px) {
+  .schedule-day {
+    min-height: 0;
+  }
+}
