@@ -310,8 +310,11 @@ section h2 {
   list-style: none;
 }
 
-.project-details summary::-webkit-details-marker {
-  display: none;
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .project-details summary::after {
@@ -320,8 +323,14 @@ section h2 {
   font-size: 1.15rem;
 }
 
-.project-details[open] summary::after {
-  content: "−";
+.contact-item span {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .project-details ol,
