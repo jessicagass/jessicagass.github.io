@@ -35,8 +35,8 @@
 
     <section class="highlights">
       <div class="section-inner">
-        <h2>Featured Project</h2>
-        <div class="cards">
+        <h2>Featured Projects</h2>
+        <div class="cards project-showcase">
           <div class="card">
             <h3>Outlook Recurring Email Scheduler</h3>
             <p>
@@ -71,6 +71,59 @@
               </ul>
             </details>
           </div>
+
+          <div class="card">
+            <h3>Interactive Project Scheduler</h3>
+            <p>
+              A browser-based planner for mapping project deadlines, progress, and task steps into a two-week schedule.
+              Add a project, assign importance, and click tasks as you complete them.
+            </p>
+            <ul class="compact-list feature-list">
+              <li>Prioritizes projects by urgency, remaining progress, and importance.</li>
+              <li>Spreads steps across the next 14 days without altering your source entries.</li>
+              <li>Keeps completed tasks visually distinct for quick status tracking.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="project-scheduler" class="scheduler-section">
+      <div class="section-inner">
+        <div class="panel scheduler-panel">
+          <div class="scheduler-header">
+            <span class="eyebrow">Interactive Tool</span>
+            <h2>Interactive Project Scheduler</h2>
+            <p class="lead">
+              Build a short-range plan for active projects by entering each deadline, current stage, and estimated steps.
+            </p>
+          </div>
+
+          <form id="projectForm" class="scheduler-form">
+            <label>Project Name
+              <input type="text" id="projectName" name="projectName" required>
+            </label>
+            <label>Stage (0-100%)
+              <input type="number" id="projectStage" name="projectStage" min="0" max="100" required>
+            </label>
+            <label>Deadline
+              <input type="date" id="deadline" name="deadline" required>
+            </label>
+            <label>Importance (1-5)
+              <input type="number" id="importance" name="importance" min="1" max="5" required>
+            </label>
+            <label class="scheduler-form-full">Steps (comma separated, format Step:hours)
+              <input type="text" id="steps" name="steps" placeholder="Design:2, Coding:3, Test:1">
+            </label>
+            <div class="inline-actions scheduler-form-full">
+              <button type="submit" class="button">Add Project</button>
+            </div>
+          </form>
+
+          <div id="schedulerStatus" class="scheduler-status" aria-live="polite">
+            Add a project to generate a two-week task schedule.
+          </div>
+          <div id="calendar" class="cards scheduler-calendar" aria-live="polite"></div>
         </div>
       </div>
     </section>
@@ -116,6 +169,13 @@ while True:
     `;
 
     const downloadBtn = document.getElementById("download-btn");
+    const projectForm = document.getElementById("projectForm");
+    const calendarEl = document.getElementById("calendar");
+    const schedulerStatus = document.getElementById("schedulerStatus");
+    const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+    let projects = [];
+
     downloadBtn.addEventListener("click", () => {
       const blob = new Blob([code], { type: "text/x-python" });
       const url = URL.createObjectURL(blob);
@@ -127,6 +187,138 @@ while True:
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     });
+
+    projectForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const name = document.getElementById("projectName").value.trim();
+      const stage = Number(document.getElementById("projectStage").value);
+      const deadline = document.getElementById("deadline").value;
+      const importance = Number(document.getElementById("importance").value);
+      const stepsInput = document.getElementById("steps").value.trim();
+
+      const steps = stepsInput
+        ? stepsInput
+            .split(",")
+            .map((entry) => {
+              const [desc, time] = entry.split(":");
+              return {
+                desc: (desc || "Planning task").trim(),
+                time: Number(time) || 1,
+                completed: false,
+              };
+            })
+            .filter((step) => step.desc)
+        : [{ desc: "General project work", time: 1, completed: false }];
+
+      projects.push({ name, stage, deadline, importance, steps });
+      projectForm.reset();
+      renderCalendar();
+    });
+
+    function prioritizeProjects() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      return projects
+        .map((project) => {
+          const deadlineDate = new Date(`${project.deadline}T00:00:00`);
+          const daysLeft = Math.ceil((deadlineDate - today) / MS_PER_DAY);
+          const urgency = (100 - project.stage) / Math.max(daysLeft, 1);
+          const priorityScore = urgency * project.importance;
+
+          return {
+            ...project,
+            priorityScore,
+            daysLeft,
+            steps: project.steps.map((step, index) => ({ ...step, originalIndex: index })),
+          };
+        })
+        .sort((a, b) => b.priorityScore - a.priorityScore);
+    }
+
+    function formatDate(date) {
+      return date.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      });
+    }
+
+    function renderCalendar() {
+      calendarEl.innerHTML = "";
+
+      if (!projects.length) {
+        schedulerStatus.textContent = "Add a project to generate a two-week task schedule.";
+        return;
+      }
+
+      const sortedProjects = prioritizeProjects();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      schedulerStatus.textContent = `${projects.length} project${projects.length === 1 ? "" : "s"} scheduled across the next 14 days.`;
+
+      for (let i = 0; i < 14; i += 1) {
+        const dayEl = document.createElement("article");
+        dayEl.className = "card schedule-day";
+
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+
+        const heading = document.createElement("strong");
+        heading.className = "schedule-day-title";
+        heading.textContent = formatDate(date);
+        dayEl.appendChild(heading);
+
+        let hasTasks = false;
+
+        sortedProjects.forEach((project) => {
+          if (!project.steps.length) {
+            return;
+          }
+
+          const step = project.steps.shift();
+          if (!step) {
+            return;
+          }
+
+          hasTasks = true;
+          const taskEl = document.createElement("button");
+          taskEl.type = "button";
+          taskEl.className = "task-pill";
+          taskEl.textContent = `${project.name}: ${step.desc} (${step.time}h)`;
+          taskEl.setAttribute("aria-pressed", String(step.completed));
+
+          taskEl.addEventListener("click", () => {
+            const originalProject = projects.find((item) => item.name === project.name && item.deadline === project.deadline);
+            if (!originalProject) {
+              return;
+            }
+
+            const originalStep = originalProject.steps[step.originalIndex];
+            originalStep.completed = !originalStep.completed;
+            taskEl.classList.toggle("completed", originalStep.completed);
+            taskEl.setAttribute("aria-pressed", String(originalStep.completed));
+          });
+
+          if (step.completed) {
+            taskEl.classList.add("completed");
+          }
+
+          dayEl.appendChild(taskEl);
+        });
+
+        if (!hasTasks) {
+          const emptyState = document.createElement("p");
+          emptyState.className = "schedule-empty";
+          emptyState.textContent = "No scheduled steps.";
+          dayEl.appendChild(emptyState);
+        }
+
+        calendarEl.appendChild(dayEl);
+      }
+    }
   </script>
 
 </body>
