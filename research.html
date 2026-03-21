@@ -1,118 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jessica Gass | Projects</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research | Jessica Gass</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <!-- Navbar -->
-  <header>
+<header>
     <nav class="navbar">
-      <h1 class="logo">Jessica Gass</h1>
-      <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="research.html">Research</a></li>
-        <li><a href="projects.html" class="active">Projects</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
+        <h1 class="logo">Jessica Gass</h1>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="research.html">Research</a></li>
+ <li><a href="projects.html" class="active">Projects</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
     </nav>
-  </header>
+</header>
 
-  <!-- Main Section -->
-  <main>
-    <section class="highlights">
-      <h2>My Projects</h2>
-      <div class="cards">
+<section class="hero">
+    <div class="hero-text">
+        <h2>Research</h2>
+        <p>
+            My research examines how daily experiences shape employee well-being, recovery,
+            and performance, with particular attention to stress processes across work and non-work domains.
+        </p>
+    </div>
+</section>
 
-        <!-- Project 1 -->
+<section class="about">
+    <h2>Research Program</h2>
+    <p>
+        My research program focuses on the intersection of work and non-work experiences, with an emphasis on
+        how employees recover from stress and how daily contextual factors influence affective and behavioral outcomes.
+        I draw on experience sampling and daily diary methodologies to capture within-person dynamics across time.
+    </p>
+</section>
+
+<section class="highlights">
+    <h2>Research Areas</h2>
+    <div class="cards">
         <div class="card">
-          <h3>Outlook Recurring Email Scheduler</h3>
-          <p>
-            A Python script that automatically sends recurring emails through Outlook at scheduled times.
-            Uses <code>pywin32</code> and <code>schedule</code> for automation.
-          </p>
-          <button class="button" id="download-btn">Download Code</button>
-
-          <h4>Instructions for Full Automation</h4>
-          <ol class="instructions">
-            <li>Open Task Scheduler</li>
-            <li>Create Basic Task</li>
-            <li>Trigger: At log on or Daily</li>
-            <li>Action: Start a Program</li>
-            <li>Program: python.exe</li>
-            <li>Arguments: <code>C:\path\to\outlook_scheduler.py</code></li>
-            <li>Start in: <code>C:\path\to\</code></li>
-          </ol>
-
-          <h4>Scheduling Options & Adjustments</h4>
-          <p>You can adjust when the script sends emails and to whom:</p>
-          <ul>
-            <li><strong>Daily at 9:00 AM:</strong> <code>schedule.every().day.at("09:00").do(send_outlook_email)</code></li>
-            <li><strong>Weekly (Monday at 10:30):</strong> <code>schedule.every().monday.at("10:30").do(send_outlook_email)</code></li>
-            <li><strong>Every 2 hours:</strong> <code>schedule.every(2).hours.do(send_outlook_email)</code></li>
-            <li><strong>Multiple recipients:</strong> <code>mail.To = "a@example.com; b@example.com"</code></li>
-          </ul>
+            <h3>Work Stress and Recovery</h3>
+            <p>
+                Investigating how employees recover from work-related stressors and how recovery processes
+                influence next-day well-being and performance.
+            </p>
         </div>
+        <div class="card">
+            <h3>Commuting and Daily Dynamics</h3>
+            <p>
+                Examining how commuting experiences contribute to affective states, rumination, and safety-related outcomes
+                in the transition between home and work.
+            </p>
+        </div>
+        <div class="card">
+            <h3>Volunteering and Role Congruence</h3>
+            <p>
+                Exploring how alignment between volunteer motivations and experiences relates to work engagement
+                and recovery processes.
+            </p>
+        </div>
+        <div class="card">
+            <h3>Identity and Workplace Experiences</h3>
+            <p>
+                Studying how identity-related factors, including stigma, shape daily experiences, sleep, and well-being
+                among underrepresented employee populations.
+            </p>
+        </div>
+    </div>
+</section>
 
-      </div>
-    </section>
-  </main>
+<section>
+    <h2>Publications</h2>
+    <p style="max-width: 800px; margin: auto; text-align: left;">
+        Hickman, L., Huynh, C., Gass, J., Booth, B., Kuruzovich, J., & Tay, L. (2024).
+        Whither bias goes, I will go: An integrative, systematic review of algorithmic bias mitigation.
+        <em>Journal of Applied Psychology.</em>
+    </p>
+</section>
 
-  <!-- Footer -->
-  <footer>
-    &copy; 2026 Jessica Gass | Designed for GitHub Pages
-  </footer>
+<section>
+    <h2>Selected Conference Presentations</h2>
+    <ul style="max-width: 800px; margin: auto; text-align: left;">
+        <li>
+            Gass, J. A., Dosumu, F., & Calderwood, C. (2025).
+            Emotions and worker safety: Do optimal levels of affect mitigate unsafe commuting events?
+            <em>Academy of Management Annual Meeting.</em>
+        </li>
+        <li>
+            Dosumu, F., Gass, J. A., et al. (2025).
+            Understanding how sleep and morning commute set the stage for workday physical activity and daily job performance.
+            <em>Academy of Management Annual Meeting.</em>
+        </li>
+        <li>
+            Gass, J. A., & Calderwood, C. (2025).
+            Exploring volunteer motivation congruence in relation to work recovery.
+            <em>Society for Industrial and Organizational Psychology Annual Conference.</em>
+        </li>
+        <li>
+            Gass, J., Dosumu, F., & Calderwood, C. (2024).
+            Work-family conflict to unsafe commuting: A road through perceived stress and affect.
+            <em>Society for Industrial and Organizational Psychology Annual Conference.</em>
+        </li>
+    </ul>
+</section>
 
-  <!-- JavaScript for downloading Project 1 Python code -->
-  <script>
-    const code = `
-python -m pip install pywin32 schedule
-import win32com.client
-import schedule
-import time
-from datetime import datetime
+<section>
+    <h2>Work in Progress</h2>
+    <p style="max-width: 800px; margin: auto; text-align: left;">
+        Dosumu, F., Gass, J. A., & Calderwood, C. 
+        Work-family conflict to unsafe pre-work commuting: A road through sleep and affect. (Manuscript under review)
+    </p>
+</section>
 
-def send_outlook_email():
-    try:
-        outlook = win32com.client.Dispatch("Outlook.Application")
-        mail = outlook.CreateItem(0)
-        mail.To = "recipient@example.com"
-        mail.CC = ""
-        mail.Subject = "Scheduled Outlook Email"
-        mail.Body = (
-            "Hello,\\n\\n"
-            "This is a recurring scheduled email sent via Python and Outlook.\\n\\n"
-            f"Sent at: {datetime.now()}\\n\\n"
-            "Best regards,"
-        )
-        mail.Send()
-        print(f"Email sent successfully at {datetime.now()}")
-    except Exception as e:
-        print("Error sending email:", e)
+<section class="contact">
+    <h2>Contact</h2>
+    <p>Email: <a href="mailto:jgass@vt.edu">jgass@vt.edu</a></p>
+    <p>Location: Blacksburg, VA</p>
+</section>
 
-schedule.every().day.at("09:00").do(send_outlook_email)
-print("Outlook email scheduler started...")
-while True:
-    schedule.run_pending()
-    time.sleep(30)
-    `;
-
-    const downloadBtn = document.getElementById("download-btn");
-    downloadBtn.addEventListener("click", () => {
-      const blob = new Blob([code], { type: "text/x-python" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "outlook_email_scheduler.py";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-  </script>
+<footer>
+    <p>© 2026 Jessica Gass</p>
+</footer>
 
 </body>
 </html>
