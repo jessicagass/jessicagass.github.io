@@ -162,48 +162,6 @@
         </div>
       </div>
     </section>
-
-    <section class="highlights">
-      <div class="section-inner">
-        <h2>Where JavaScript is used on this page</h2>
-        <div class="card">
-          <p>
-            The Projects page includes JavaScript in the inline <code>&lt;script&gt;</code> block at the bottom of this file.
-            That script powers interactive features for both project cards.
-          </p>
-          <ul>
-            <li>
-              <strong>Outlook Scheduler download button:</strong>
-              JavaScript listens for clicks on <code>Download Code</code>, creates a temporary file in the browser, and downloads it as <code>outlook_email_scheduler.py</code>.
-            </li>
-            <li>
-              <strong>Interactive Project Scheduler form logic:</strong>
-              JavaScript reads your inputs (deadline, progress, total hours, and optional steps), validates/normalizes values, and stores each project in memory.
-            </li>
-            <li>
-              <strong>Scheduling calculations:</strong>
-              JavaScript computes remaining hours, prioritizes projects, applies rest-day and meeting-day constraints, and distributes work across the next 14 days.
-            </li>
-            <li>
-              <strong>Dynamic calendar rendering:</strong>
-              JavaScript builds the day cards and task buttons in real time so the schedule updates immediately after every change.
-            </li>
-            <li>
-              <strong>Progress toggles:</strong>
-              Clicking a task pill toggles completed state, then recalculates and rerenders the schedule.
-            </li>
-            <li>
-              <strong>Local save + restore:</strong>
-              JavaScript saves settings and projects with <code>localStorage</code> so data persists across page reloads in the same browser.
-            </li>
-            <li>
-              <strong>Schedule export:</strong>
-              JavaScript generates a text summary of the plan and downloads it as <code>project-schedule.txt</code>.
-            </li>
-          </ul>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer>
