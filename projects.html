@@ -159,6 +159,46 @@
               </div>
             </div>
           </details>
+
+          <details class="card project-card volunteer-chatbot-card">
+            <summary class="project-card-summary">
+              <div>
+                <h3>Volunteer Opportunity Guide Chatbot</h3>
+                <p>
+                  A JavaScript chatbot prototype that helps people discover local or remote volunteer opportunities using Idealist search best practices (location, radius, cause areas, skills, and alerts).
+                </p>
+              </div>
+              <span class="project-card-toggle" aria-hidden="true">Expand project</span>
+            </summary>
+
+            <div class="project-card-body volunteer-chatbot-body">
+              <div class="panel volunteer-chatbot-panel">
+                <h2>Ask the Volunteer Finder chatbot</h2>
+                <p class="lead">
+                  Try asking about nearby opportunities, remote options, or how to narrow search results.
+                </p>
+
+                <div id="volunteerChatLog" class="volunteer-chat-log" aria-live="polite"></div>
+
+                <form id="volunteerChatForm" class="volunteer-chat-form">
+                  <label for="volunteerChatInput" class="volunteer-chat-label">Your question</label>
+                  <input
+                    id="volunteerChatInput"
+                    name="volunteerChatInput"
+                    type="text"
+                    placeholder="Example: How do I find weekend opportunities near me?"
+                    autocomplete="off"
+                    required
+                  >
+                  <div class="inline-actions">
+                    <button type="submit" class="button">Ask Chatbot</button>
+                    <button type="button" id="volunteerChatReset" class="button-secondary">Clear Chat</button>
+                    <a class="button-secondary" href="https://www.idealist.org/en/volunteer" target="_blank" rel="noopener noreferrer">Open Idealist Volunteer</a>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </section>
@@ -221,6 +261,10 @@ while True:
     const resetScheduleBtn = document.getElementById("resetScheduleBtn");
     const calendarEl = document.getElementById("calendar");
     const schedulerStatus = document.getElementById("schedulerStatus");
+    const volunteerChatForm = document.getElementById("volunteerChatForm");
+    const volunteerChatInput = document.getElementById("volunteerChatInput");
+    const volunteerChatLog = document.getElementById("volunteerChatLog");
+    const volunteerChatResetBtn = document.getElementById("volunteerChatReset");
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
     const WEEKDAY_INDEX = {
       sunday: 0,
@@ -309,6 +353,87 @@ while True:
 
     resetScheduleBtn.addEventListener("click", () => {
       resetScheduler();
+    });
+
+    const volunteerChatOpeners = [
+      "Hi! I can help you use Idealist's volunteer search. Tell me your city (or ask for remote) and the cause area or skills you care about.",
+      "You can ask things like: 'How do I find hybrid opportunities in Chicago?' or 'How can I get email alerts for new volunteer roles?'",
+    ];
+
+    const volunteerChatKnowledge = [
+      {
+        keywords: ["remote", "virtual", "online"],
+        answer: "For remote opportunities, choose Location Type = Remote. You may not need to enter a city when searching virtual roles.",
+      },
+      {
+        keywords: ["near", "local", "nearby", "city", "zip", "location", "radius"],
+        answer: "For local opportunities, enter your city in Location and adjust Radius to control how far you're willing to travel for on-site or hybrid roles.",
+      },
+      {
+        keywords: ["cause", "passion", "interest", "environment", "education", "animals", "health"],
+        answer: "Use the Cause Areas filter to focus on topics you care about. You can select one or multiple cause areas.",
+      },
+      {
+        keywords: ["skill", "experience", "coding", "design", "writing", "language"],
+        answer: "Use the Skills filter to match opportunities to what you can offer (or skills you want to build).",
+      },
+      {
+        keywords: ["date", "weekend", "time", "schedule", "newest", "recent", "recency"],
+        answer: "Filter by Date for when opportunities occur, and use Newest/Recency filters to prioritize recently posted listings.",
+      },
+      {
+        keywords: ["alert", "email", "save", "saved", "notify", "notification"],
+        answer: "Once you log in, save your search and turn on email alerts to be notified when new matching volunteer opportunities are posted.",
+      },
+      {
+        keywords: ["apply", "application", "how to apply"],
+        answer: "Open any listing and follow the 'How to Apply' instructions. Some organizations accept applications on Idealist, while others direct you to email or an external site.",
+      },
+    ];
+
+    function appendVolunteerChatMessage(role, text) {
+      const message = document.createElement("p");
+      message.className = `volunteer-chat-message ${role}`;
+      message.textContent = text;
+      volunteerChatLog.appendChild(message);
+      volunteerChatLog.scrollTop = volunteerChatLog.scrollHeight;
+    }
+
+    function getVolunteerBotReply(question) {
+      const input = question.toLowerCase();
+      const matches = volunteerChatKnowledge.filter((entry) =>
+        entry.keywords.some((keyword) => input.includes(keyword))
+      );
+
+      if (!matches.length) {
+        return "A good next step is to search on Idealist by Location Type, city + radius, Cause Areas, and Skills. If you share your city and interests, I can suggest a focused search plan.";
+      }
+
+      return matches.map((entry) => entry.answer).join(" ");
+    }
+
+    function resetVolunteerChat() {
+      volunteerChatLog.innerHTML = "";
+      volunteerChatOpeners.forEach((message) => appendVolunteerChatMessage("bot", message));
+    }
+
+    volunteerChatForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const question = volunteerChatInput.value.trim();
+
+      if (!question) {
+        return;
+      }
+
+      appendVolunteerChatMessage("user", question);
+      appendVolunteerChatMessage("bot", getVolunteerBotReply(question));
+      volunteerChatInput.value = "";
+      volunteerChatInput.focus();
+    });
+
+    volunteerChatResetBtn.addEventListener("click", () => {
+      resetVolunteerChat();
+      volunteerChatInput.focus();
     });
 
     function parseWeekdays(value) {
@@ -779,6 +904,7 @@ while True:
 
     restoreSchedulerState();
     renderCalendar(projects.length ? "Saved schedule restored." : "");
+    resetVolunteerChat();
   </script>
 
 </body>
