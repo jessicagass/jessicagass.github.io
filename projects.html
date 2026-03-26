@@ -378,7 +378,7 @@ while True:
         causes: ["education", "youth"],
         commitment: "1-2 hours per week",
         summary: "Mentor K-12 or first-generation students through virtual weekly check-ins and goal coaching.",
-        url: "https://www.idealist.org/en/volunteer-opportunities?q=virtual+student+mentor",
+        searchKeywords: "virtual student mentor education youth",
       },
       {
         title: "Community Program Coordinator Assistant",
@@ -388,7 +388,7 @@ while True:
         causes: ["community", "human services"],
         commitment: "Flexible weekday support",
         summary: "Handle remote planning and communications with occasional on-site community events.",
-        url: "https://www.idealist.org/en/volunteer-opportunities?q=community+program+coordinator+assistant",
+        searchKeywords: "community program coordinator assistant volunteer",
       },
       {
         title: "Grant Writing Volunteer",
@@ -398,7 +398,7 @@ while True:
         causes: ["fundraising", "capacity building"],
         commitment: "Project-based",
         summary: "Draft grant narratives and budgets remotely with occasional strategy meetings.",
-        url: "https://www.idealist.org/en/volunteer-opportunities?q=grant+writing+volunteer",
+        searchKeywords: "grant writing volunteer nonprofit fundraising",
       },
       {
         title: "Food Access Distribution Support",
@@ -408,7 +408,7 @@ while True:
         causes: ["food security", "poverty"],
         commitment: "Weekend or evening shifts",
         summary: "Support sorting, packing, and distribution for local food-access programs.",
-        url: "https://www.idealist.org/en/volunteer-opportunities?q=food+bank+volunteer",
+        searchKeywords: "food bank volunteer distribution support",
       },
       {
         title: "Refugee and Immigrant Family Support",
@@ -418,7 +418,7 @@ while True:
         causes: ["refugee support", "immigration"],
         commitment: "2-4 hours per week",
         summary: "Assist with remote paperwork and in-person orientation or appointment accompaniment.",
-        url: "https://www.idealist.org/en/volunteer-opportunities?q=refugee+support+volunteer",
+        searchKeywords: "refugee immigrant family support volunteer",
       },
       {
         title: "Crisis Textline/Helpline Volunteer",
@@ -428,7 +428,7 @@ while True:
         causes: ["mental health", "crisis support"],
         commitment: "Scheduled shifts",
         summary: "Provide supervised support in text/phone programs after required training.",
-        url: "https://www.idealist.org/en/volunteer-opportunities?q=crisis+helpline+volunteer",
+        searchKeywords: "crisis helpline volunteer mental health",
       },
       {
         title: "Sustainability Data & Outreach Volunteer",
@@ -438,7 +438,7 @@ while True:
         causes: ["environment", "climate"],
         commitment: "Weekly",
         summary: "Support impact tracking remotely and join in-person outreach events.",
-        url: "https://www.idealist.org/en/volunteer-opportunities?q=sustainability+volunteer",
+        searchKeywords: "sustainability outreach volunteer environment climate",
       },
       {
         title: "Volunteer Social Media & Storytelling",
@@ -448,7 +448,7 @@ while True:
         causes: ["communications", "advocacy"],
         commitment: "Flexible",
         summary: "Create posts, short videos, and campaign content with optional in-person media days.",
-        url: "https://www.idealist.org/en/volunteer-opportunities?q=social+media+volunteer",
+        searchKeywords: "social media storytelling volunteer nonprofit",
       },
     ];
 
@@ -551,7 +551,7 @@ while True:
         payload.opportunities.forEach((opportunity, index) => {
           const item = document.createElement("li");
           const link = document.createElement("a");
-          link.href = opportunity.url;
+          link.href = buildIdealistOpportunityUrl(opportunity);
           link.target = "_blank";
           link.rel = "noopener noreferrer";
           link.textContent = `${index + 1}) ${opportunity.title} — ${opportunity.organization}`;
@@ -642,6 +642,13 @@ while True:
         [IDEALIST_SOURCES[0]],
         topMatches
       );
+    }
+
+    function buildIdealistOpportunityUrl(opportunity) {
+      const query = opportunity.searchKeywords || `${opportunity.title} volunteer`;
+      const url = new URL("https://www.idealist.org/en/volunteer-opportunities");
+      url.searchParams.set("keywords", query);
+      return url.toString();
     }
 
     function detectModality(input) {
