@@ -371,6 +371,17 @@ while True:
 
     const volunteerOpportunityCatalog = [
       {
+        title: "Hospice Tuck-In Program Volunteer",
+        organization: "Liberty HomeCare and Hospice",
+        location: "Raleigh, Cary, and surrounding areas (NC)",
+        modality: "on-site",
+        causes: ["health", "hospice", "community"],
+        commitment: "Weekend and evening support",
+        summary: "Help provide practical support and comfort-focused visits for hospice patients and families.",
+        searchKeywords: "hospice tuck in volunteer raleigh cary",
+        idealistUrl: "https://www.idealist.org/en/volunteer-opportunity/16574b144f4c4630ad6c453a694f13d7-volunteers-needed-hospice-tuck-in-program-raleigh-cary-and-surrounding-areas-liberty-homecare-and-hospice-raleigh",
+      },
+      {
         title: "Virtual Student Mentor",
         organization: "Education nonprofit partners",
         location: "Remote (US)",
@@ -379,6 +390,7 @@ while True:
         commitment: "1-2 hours per week",
         summary: "Mentor K-12 or first-generation students through virtual weekly check-ins and goal coaching.",
         searchKeywords: "virtual student mentor education youth",
+        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=virtual%20student%20mentor%20education%20youth",
       },
       {
         title: "Community Program Coordinator Assistant",
@@ -389,6 +401,7 @@ while True:
         commitment: "Flexible weekday support",
         summary: "Handle remote planning and communications with occasional on-site community events.",
         searchKeywords: "community program coordinator assistant volunteer",
+        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=community%20program%20coordinator%20assistant%20volunteer",
       },
       {
         title: "Grant Writing Volunteer",
@@ -399,6 +412,7 @@ while True:
         commitment: "Project-based",
         summary: "Draft grant narratives and budgets remotely with occasional strategy meetings.",
         searchKeywords: "grant writing volunteer nonprofit fundraising",
+        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=grant%20writing%20volunteer%20nonprofit%20fundraising",
       },
       {
         title: "Food Access Distribution Support",
@@ -409,6 +423,7 @@ while True:
         commitment: "Weekend or evening shifts",
         summary: "Support sorting, packing, and distribution for local food-access programs.",
         searchKeywords: "food bank volunteer distribution support",
+        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=food%20bank%20volunteer%20distribution%20support",
       },
       {
         title: "Refugee and Immigrant Family Support",
@@ -419,6 +434,7 @@ while True:
         commitment: "2-4 hours per week",
         summary: "Assist with remote paperwork and in-person orientation or appointment accompaniment.",
         searchKeywords: "refugee immigrant family support volunteer",
+        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=refugee%20immigrant%20family%20support%20volunteer",
       },
       {
         title: "Crisis Textline/Helpline Volunteer",
@@ -429,6 +445,7 @@ while True:
         commitment: "Scheduled shifts",
         summary: "Provide supervised support in text/phone programs after required training.",
         searchKeywords: "crisis helpline volunteer mental health",
+        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=crisis%20helpline%20volunteer%20mental%20health",
       },
       {
         title: "Sustainability Data & Outreach Volunteer",
@@ -439,6 +456,7 @@ while True:
         commitment: "Weekly",
         summary: "Support impact tracking remotely and join in-person outreach events.",
         searchKeywords: "sustainability outreach volunteer environment climate",
+        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=sustainability%20outreach%20volunteer%20environment%20climate",
       },
       {
         title: "Volunteer Social Media & Storytelling",
@@ -449,6 +467,7 @@ while True:
         commitment: "Flexible",
         summary: "Create posts, short videos, and campaign content with optional in-person media days.",
         searchKeywords: "social media storytelling volunteer nonprofit",
+        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=social%20media%20storytelling%20volunteer%20nonprofit",
       },
     ];
 
@@ -645,6 +664,9 @@ while True:
     }
 
     function buildIdealistOpportunityUrl(opportunity) {
+      if (opportunity.idealistUrl) {
+        return opportunity.idealistUrl;
+      }
       const query = opportunity.searchKeywords || `${opportunity.title} volunteer`;
       const url = new URL("https://www.idealist.org/en/volunteer-opportunities");
       url.searchParams.set("keywords", query);

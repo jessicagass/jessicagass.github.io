@@ -772,11 +772,17 @@ footer {
 }
 
 .volunteer-chat-message.user .volunteer-chat-author {
-  opacity: 0.92;
+  opacity: 1;
+  color: #ffffff;
 }
 
 .volunteer-chat-message.user .volunteer-chat-text {
   font-weight: 600;
+  color: #ffffff;
+}
+
+.volunteer-chat-message.user a {
+  color: #ffffff;
 }
 
 .volunteer-opportunity-links {
