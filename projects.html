@@ -175,27 +175,36 @@
               <div class="panel volunteer-chatbot-panel">
                 <h2>Ask the Volunteer Finder chatbot</h2>
                 <p class="lead">
-                  Try asking about nearby opportunities, remote options, or how to narrow search results.
+                  Ask questions about anything on this Projects page and get a direct answer in chat.
                 </p>
 
-                <div id="volunteerChatLog" class="volunteer-chat-log" aria-live="polite"></div>
-
-                <form id="volunteerChatForm" class="volunteer-chat-form">
-                  <label for="volunteerChatInput" class="volunteer-chat-label">Your question</label>
-                  <input
-                    id="volunteerChatInput"
-                    name="volunteerChatInput"
-                    type="text"
-                    placeholder="Example: How do I find weekend opportunities near me?"
-                    autocomplete="off"
-                    required
-                  >
-                  <div class="inline-actions">
-                    <button type="submit" class="button">Ask Chatbot</button>
-                    <button type="button" id="volunteerChatReset" class="button-secondary">Clear Chat</button>
-                    <a class="button-secondary" href="https://www.idealist.org/en/volunteer" target="_blank" rel="noopener noreferrer">Open Idealist Volunteer</a>
+                <div class="chatbox-shell" role="region" aria-label="Volunteer Finder Chat">
+                  <div class="chatbox-header">
+                    <span class="chatbox-indicator" aria-hidden="true"></span>
+                    <div>
+                      <p class="chatbox-title">Volunteer Finder</p>
+                      <p class="chatbox-subtitle">Online now</p>
+                    </div>
                   </div>
-                </form>
+
+                  <div id="volunteerChatLog" class="volunteer-chat-log" aria-live="polite"></div>
+
+                  <form id="volunteerChatForm" class="volunteer-chat-form">
+                    <label for="volunteerChatInput" class="visually-hidden">Your message</label>
+                    <input
+                      id="volunteerChatInput"
+                      name="volunteerChatInput"
+                      type="text"
+                      placeholder="Type your message..."
+                      autocomplete="off"
+                      required
+                    >
+                    <div class="inline-actions chatbox-actions">
+                      <button type="submit" class="button">Send</button>
+                      <button type="button" id="volunteerChatReset" class="button-secondary">Clear</button>
+                    </div>
+                  </form>
+                  </div>
               </div>
             </div>
           </details>
@@ -356,18 +365,46 @@ while True:
     });
 
     const volunteerChatOpeners = [
-      "Hi! I can help you use Idealist's volunteer search. Tell me your city (or ask for remote) and the cause area or skills you care about.",
-      "You can ask things like: 'How do I find hybrid opportunities in Chicago?' or 'How can I get email alerts for new volunteer roles?'",
+      "Hi! I can answer questions about the tools listed on this Projects page, including the Outlook Email Scheduler, Interactive Project Scheduler, and Volunteer Opportunity Guide.",
+      "Try asking things like: 'How do I automate the Outlook script?', 'What settings are in the project scheduler?', or 'How do I find remote volunteer roles?'",
     ];
 
     const volunteerChatKnowledge = [
       {
+        keywords: ["projects", "project page", "what is on this page", "featured projects", "what tools"],
+        answer: "This page highlights three tools: the Outlook Recurring Email Scheduler, the Interactive Project Scheduler, and the Volunteer Opportunity Guide Chatbot.",
+      },
+      {
+        keywords: ["outlook", "email scheduler", "recurring email", "download code", "pywin32", "python"],
+        answer: "The Outlook Recurring Email Scheduler is a Python script that uses pywin32 and schedule to send recurring Outlook emails. It includes examples for daily, weekly, and every-2-hours sends, and supports multiple recipients.",
+      },
+      {
+        keywords: ["task scheduler", "automation", "windows", "full automation", "run automatically"],
+        answer: "For full automation, the page instructions say to create a Windows Task Scheduler task, trigger it at log on or daily, run python.exe, pass your script path as the argument, and set the start-in directory to the script folder.",
+      },
+      {
+        keywords: ["interactive project scheduler", "balanced plan", "deadline", "importance", "total hours", "stage"],
+        answer: "The Interactive Project Scheduler builds a balanced two-week workload based on your project stage, deadline, importance, and total hours remaining.",
+      },
+      {
+        keywords: ["rest days", "meeting-heavy", "availability settings", "shared settings"],
+        answer: "The scheduler has shared availability settings for Rest Days and Meeting-Heavy Days. Rest days receive no new assignments, while meeting-heavy days get lighter (about half-capacity) assignments.",
+      },
+      {
+        keywords: ["steps", "optional steps", "step breakdown", "research:4", "draft:6"],
+        answer: "You can optionally break work into steps with a format like Step:hours (for example, Research:4, Draft:6, Revise:2), and the planner distributes remaining work across upcoming days.",
+      },
+      {
+        keywords: ["save schedule", "download schedule", "reset scheduler"],
+        answer: "The scheduler includes actions to Save Schedule, Download Schedule, and Reset Scheduler directly from the Projects page.",
+      },
+      {
         keywords: ["remote", "virtual", "online"],
-        answer: "For remote opportunities, choose Location Type = Remote. You may not need to enter a city when searching virtual roles.",
+        answer: "For remote opportunities, use filters for remote/virtual roles so your results focus on online options.",
       },
       {
         keywords: ["near", "local", "nearby", "city", "zip", "location", "radius"],
-        answer: "For local opportunities, enter your city in Location and adjust Radius to control how far you're willing to travel for on-site or hybrid roles.",
+        answer: "For local opportunities, use city or ZIP with a travel radius to narrow on-site or hybrid roles near you.",
       },
       {
         keywords: ["cause", "passion", "interest", "environment", "education", "animals", "health"],
@@ -379,22 +416,32 @@ while True:
       },
       {
         keywords: ["date", "weekend", "time", "schedule", "newest", "recent", "recency"],
-        answer: "Filter by Date for when opportunities occur, and use Newest/Recency filters to prioritize recently posted listings.",
+        answer: "You can filter by date/time preferences (like weekends) and sort by recency to surface newer opportunities first.",
       },
       {
         keywords: ["alert", "email", "save", "saved", "notify", "notification"],
-        answer: "Once you log in, save your search and turn on email alerts to be notified when new matching volunteer opportunities are posted.",
+        answer: "The page recommends saving searches and enabling alerts so new matching volunteer opportunities are surfaced automatically.",
       },
       {
         keywords: ["apply", "application", "how to apply"],
-        answer: "Open any listing and follow the 'How to Apply' instructions. Some organizations accept applications on Idealist, while others direct you to email or an external site.",
+        answer: "Each volunteer listing has application instructions; follow the steps shown in that listing to submit successfully.",
       },
     ];
 
     function appendVolunteerChatMessage(role, text) {
-      const message = document.createElement("p");
+      const message = document.createElement("div");
       message.className = `volunteer-chat-message ${role}`;
-      message.textContent = text;
+      const roleLabel = role === "bot" ? "Volunteer Finder" : "You";
+
+      const author = document.createElement("span");
+      author.className = "volunteer-chat-author";
+      author.textContent = roleLabel;
+
+      const body = document.createElement("p");
+      body.className = "volunteer-chat-text";
+      body.textContent = text;
+
+      message.append(author, body);
       volunteerChatLog.appendChild(message);
       volunteerChatLog.scrollTop = volunteerChatLog.scrollHeight;
     }
@@ -406,7 +453,7 @@ while True:
       );
 
       if (!matches.length) {
-        return "A good next step is to search on Idealist by Location Type, city + radius, Cause Areas, and Skills. If you share your city and interests, I can suggest a focused search plan.";
+        return "I can answer from this Projects page. Ask about the Outlook scheduler setup, project scheduling settings, or volunteer-filter strategy (remote, location, cause areas, skills, alerts).";
       }
 
       return matches.map((entry) => entry.answer).join(" ");

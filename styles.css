@@ -680,30 +680,82 @@ footer {
 }
 
 .volunteer-chatbot-panel {
-  padding: clamp(2rem, 4vw, 3rem);
+  padding: clamp(1.5rem, 3vw, 2rem);
   border: 0;
   border-radius: 0;
   box-shadow: none;
   background: transparent;
 }
 
-.volunteer-chat-log {
+.chatbox-shell {
+  max-width: 760px;
   margin-top: 1rem;
-  max-height: 320px;
-  overflow-y: auto;
-  padding: 1rem;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: 0 12px 25px rgba(10, 51, 68, 0.07);
+}
+
+.chatbox-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff 0%, #f7fafb 100%);
+}
+
+.chatbox-indicator {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: #4bae78;
+  box-shadow: 0 0 0 4px rgba(75, 174, 120, 0.15);
+}
+
+.chatbox-title {
+  margin: 0;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.chatbox-subtitle {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.volunteer-chat-log {
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 1rem 0.95rem;
+  border: 0;
+  border-bottom: 1px solid var(--border);
   background: var(--surface-alt);
   display: grid;
-  gap: 0.7rem;
+  gap: 0.75rem;
 }
 
 .volunteer-chat-message {
   margin: 0;
-  padding: 0.7rem 0.85rem;
-  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+  border-radius: 16px;
   line-height: 1.45;
+  max-width: min(83%, 560px);
+}
+
+.volunteer-chat-author {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+  opacity: 0.75;
+}
+
+.volunteer-chat-text {
+  margin: 0;
 }
 
 .volunteer-chat-message.bot {
@@ -720,7 +772,9 @@ footer {
 }
 
 .volunteer-chat-form {
-  margin-top: 1rem;
+  margin-top: 0;
+  padding: 0.9rem 0.95rem 1rem;
+  background: var(--surface);
 }
 
 .volunteer-chat-label {
@@ -734,7 +788,7 @@ footer {
   width: 100%;
   padding: 0.85rem 1rem;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 999px;
   background: var(--surface);
   color: var(--text);
   font: inherit;
@@ -743,4 +797,20 @@ footer {
 .volunteer-chat-form input:focus {
   outline: 2px solid rgba(47, 107, 95, 0.18);
   border-color: var(--primary);
+}
+
+.chatbox-actions {
+  margin-top: 0.7rem;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
