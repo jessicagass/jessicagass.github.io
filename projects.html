@@ -369,12 +369,6 @@ while True:
       "Share your location, cause area, and availability (for example: 'remote tutoring in Chicago on weekends') and I’ll generate focused web-search links.",
     ];
 
-    const PRIORITY_VOLUNTEER_OPPORTUNITY = {
-      title: "Hospice Tuck-In Program Volunteer",
-      organization: "Liberty HomeCare and Hospice",
-      idealistUrl: "https://www.idealist.org/en/volunteer-opportunity/16574b144f4c4630ad6c453a694f13d7-volunteers-needed-hospice-tuck-in-program-raleigh-cary-and-surrounding-areas-liberty-homecare-and-hospice-raleigh",
-    };
-
     const IDEALIST_SOURCES = [
       {
         label: "Idealist Volunteer Opportunities",
@@ -531,17 +525,19 @@ while True:
       const sourceLinks = buildVolunteerSearchSources(question);
 
       if (!matches.length) {
+        const suggestedOpportunity = buildPromptDrivenOpportunity(input);
         return createVolunteerReply(
           "Great question — I can help best when you share location, remote/hybrid/on-site preference, cause area, and weekly availability.",
           sourceLinks,
-          [PRIORITY_VOLUNTEER_OPPORTUNITY]
+          [suggestedOpportunity]
         );
       }
 
+      const suggestedOpportunity = buildPromptDrivenOpportunity(input);
       return createVolunteerReply(
         `${matches.map((entry) => entry.answer).join(" ")} I included current search links below with Idealist and VolunteerMatch priority.`,
         sourceLinks,
-        [PRIORITY_VOLUNTEER_OPPORTUNITY]
+        [suggestedOpportunity]
       );
     }
 
@@ -559,11 +555,12 @@ while True:
       const sourceLinks = buildVolunteerSearchSources(input);
       const locationLabel = location ? ` near ${location}` : "";
       const intro = `Absolutely — I prioritized Idealist VolunteerMatch-style searching for ${modality} opportunities${locationLabel}.`;
+      const suggestedOpportunity = buildPromptDrivenOpportunity(input);
 
       return createVolunteerReply(
-        `${intro} I also used "${cause}" in the query and included your requested direct opportunity link plus live search links below.`,
+        `${intro} I also used "${cause}" in the query and included a prompt-matched Idealist opportunity search link plus live search links below.`,
         sourceLinks,
-        [PRIORITY_VOLUNTEER_OPPORTUNITY]
+        [suggestedOpportunity]
       );
     }
 
@@ -574,7 +571,35 @@ while True:
       const query = opportunity.searchKeywords || `${opportunity.title} volunteer`;
       const url = new URL("https://www.idealist.org/en/volunteer-opportunities");
       url.searchParams.set("keywords", query);
+      if (opportunity.location && opportunity.location !== "anywhere") {
+        url.searchParams.set("location", opportunity.location);
+      }
       return url.toString();
+    }
+
+    function buildPromptDrivenOpportunity(input) {
+      const modality = detectModality(input) || "any";
+      const location = detectLocation(input) || "anywhere";
+      const cause = detectCause(input) || "community support";
+      const availability = detectAvailability(input);
+
+      const keywordParts = [cause, "volunteer"];
+      if (modality !== "any") keywordParts.push(modality);
+      if (availability) keywordParts.push(availability);
+      if (location && location !== "anywhere") keywordParts.push(location);
+
+      const modalityLabel = modality === "any" ? "Flexible" : capitalizeWord(modality);
+      const title = `${modalityLabel} ${capitalizePhrase(cause)} Volunteer Opportunity`;
+      const organization = location === "anywhere"
+        ? "Idealist Nonprofit Partners"
+        : `${capitalizePhrase(location)} Community Organizations`;
+
+      return {
+        title,
+        organization,
+        location,
+        searchKeywords: keywordParts.join(" "),
+      };
     }
 
     function buildVolunteerSearchSources(question) {
@@ -629,10 +654,29 @@ while True:
       )?.[0] || "";
     }
 
+    function detectAvailability(input) {
+      if (input.includes("weekend")) return "weekend";
+      if (input.includes("evening")) return "evening";
+      if (input.includes("weekday")) return "weekday";
+      return "";
+    }
+
     function detectLocation(input) {
       const locationPattern = /\b(?:in|near|around|at)\s+([a-z\s]+?)(?:\?|$|,|\.| for | with )/i;
       const match = input.match(locationPattern);
       return match ? match[1].trim().replace(/\s+/g, " ") : "";
+    }
+
+    function capitalizeWord(value) {
+      return value.charAt(0).toUpperCase() + value.slice(1);
+    }
+
+    function capitalizePhrase(value) {
+      return value
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((word) => capitalizeWord(word))
+        .join(" ");
     }
 
     function resetVolunteerChat() {
