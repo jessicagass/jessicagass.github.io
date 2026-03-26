@@ -767,8 +767,36 @@ footer {
 
 .volunteer-chat-message.user {
   justify-self: flex-end;
-  background: var(--primary);
-  color: #fff;
+  background: #1f5d63;
+  color: #ffffff;
+}
+
+.volunteer-chat-message.user .volunteer-chat-author {
+  opacity: 0.92;
+}
+
+.volunteer-chat-message.user .volunteer-chat-text {
+  font-weight: 600;
+}
+
+.volunteer-opportunity-links {
+  margin: 0.6rem 0 0;
+  padding-left: 1rem;
+}
+
+.volunteer-opportunity-links li + li {
+  margin-top: 0.35rem;
+}
+
+.volunteer-opportunity-links a {
+  color: #0b5eb8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.volunteer-opportunity-links a:hover,
+.volunteer-opportunity-links a:focus-visible {
+  color: #08448a;
 }
 
 .volunteer-chat-form {

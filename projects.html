@@ -365,8 +365,8 @@ while True:
     });
 
     const volunteerChatOpeners = [
-      "Hi! I’m Volunteer Finder. I help you explore volunteer opportunities based on Idealist Volunteer Match-style filters and other public internet sources.",
-      "Try asking: 'What remote volunteer roles are good for writing?', 'How can I find weekend opportunities near Chicago?', or 'What cause areas should I search for mental health support?'",
+      "Hey! I’m Volunteer Finder 👋 Tell me what kind of cause, schedule, and work style you want, and I’ll help you narrow things down.",
+      "You can ask things like: 'Any remote education volunteering for 2 hours/week?' or 'Can you share real links for weekend opportunities near Chicago?'",
     ];
 
     const volunteerOpportunityCatalog = [
@@ -378,6 +378,7 @@ while True:
         causes: ["education", "youth"],
         commitment: "1-2 hours per week",
         summary: "Mentor K-12 or first-generation students through virtual weekly check-ins and goal coaching.",
+        url: "https://www.idealist.org/en/volunteer-opportunities?q=virtual+student+mentor",
       },
       {
         title: "Community Program Coordinator Assistant",
@@ -387,6 +388,7 @@ while True:
         causes: ["community", "human services"],
         commitment: "Flexible weekday support",
         summary: "Handle remote planning and communications with occasional on-site community events.",
+        url: "https://www.idealist.org/en/volunteer-opportunities?q=community+program+coordinator+assistant",
       },
       {
         title: "Grant Writing Volunteer",
@@ -396,6 +398,7 @@ while True:
         causes: ["fundraising", "capacity building"],
         commitment: "Project-based",
         summary: "Draft grant narratives and budgets remotely with occasional strategy meetings.",
+        url: "https://www.idealist.org/en/volunteer-opportunities?q=grant+writing+volunteer",
       },
       {
         title: "Food Access Distribution Support",
@@ -405,6 +408,7 @@ while True:
         causes: ["food security", "poverty"],
         commitment: "Weekend or evening shifts",
         summary: "Support sorting, packing, and distribution for local food-access programs.",
+        url: "https://www.idealist.org/en/volunteer-opportunities?q=food+bank+volunteer",
       },
       {
         title: "Refugee and Immigrant Family Support",
@@ -414,6 +418,7 @@ while True:
         causes: ["refugee support", "immigration"],
         commitment: "2-4 hours per week",
         summary: "Assist with remote paperwork and in-person orientation or appointment accompaniment.",
+        url: "https://www.idealist.org/en/volunteer-opportunities?q=refugee+support+volunteer",
       },
       {
         title: "Crisis Textline/Helpline Volunteer",
@@ -423,6 +428,7 @@ while True:
         causes: ["mental health", "crisis support"],
         commitment: "Scheduled shifts",
         summary: "Provide supervised support in text/phone programs after required training.",
+        url: "https://www.idealist.org/en/volunteer-opportunities?q=crisis+helpline+volunteer",
       },
       {
         title: "Sustainability Data & Outreach Volunteer",
@@ -432,6 +438,7 @@ while True:
         causes: ["environment", "climate"],
         commitment: "Weekly",
         summary: "Support impact tracking remotely and join in-person outreach events.",
+        url: "https://www.idealist.org/en/volunteer-opportunities?q=sustainability+volunteer",
       },
       {
         title: "Volunteer Social Media & Storytelling",
@@ -441,6 +448,7 @@ while True:
         causes: ["communications", "advocacy"],
         commitment: "Flexible",
         summary: "Create posts, short videos, and campaign content with optional in-person media days.",
+        url: "https://www.idealist.org/en/volunteer-opportunities?q=social+media+volunteer",
       },
     ];
 
@@ -516,8 +524,8 @@ while True:
       return projectTerms.some((term) => input.includes(term));
     }
 
-    function createVolunteerReply(text, sources = []) {
-      return { text, sources };
+    function createVolunteerReply(text, sources = [], opportunities = []) {
+      return { text, sources, opportunities };
     }
 
     function appendVolunteerChatMessage(role, content) {
@@ -535,6 +543,24 @@ while True:
       body.textContent = payload.text;
 
       message.append(author, body);
+
+      if (role === "bot" && payload.opportunities?.length) {
+        const opportunityList = document.createElement("ul");
+        opportunityList.className = "volunteer-opportunity-links";
+
+        payload.opportunities.forEach((opportunity, index) => {
+          const item = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = opportunity.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = `${index + 1}) ${opportunity.title} — ${opportunity.organization}`;
+          item.appendChild(link);
+          opportunityList.appendChild(item);
+        });
+
+        message.append(opportunityList);
+      }
 
       if (role === "bot" && payload.sources?.length) {
         const sourceWrapper = document.createElement("p");
@@ -577,7 +603,7 @@ while True:
       );
 
       if (!matches.length) {
-        return createVolunteerReply("I focus on volunteer opportunities. Try including details like location, remote/hybrid preference, cause area, skills, and time commitment so I can suggest stronger matches.");
+        return createVolunteerReply("Great question — I can help best when you share a few details. Tell me your location, remote/hybrid/on-site preference, cause area, and weekly availability, and I’ll suggest specific matches.");
       }
 
       return createVolunteerReply(
@@ -600,18 +626,22 @@ while True:
       const matches = findOpportunityMatches({ modality, cause });
 
       if (!matches.length) {
-        return createVolunteerReply("I could not find a close match in the built-in opportunity guide. Try asking for remote, hybrid, or on-site opportunities and include a cause area like education, environment, or mental health.", [IDEALIST_SOURCES[0]]);
+        return createVolunteerReply("I couldn’t find a close fit in my built-in guide yet. Try asking for remote, hybrid, or on-site roles and include a cause area (like education, environment, or mental health), and I’ll refine it.", [IDEALIST_SOURCES[0]]);
       }
 
       const locationLabel = location ? ` near ${location}` : "";
       const modalityLabel = modality ? `${modality} ` : "";
-      const intro = `Here are ${modalityLabel}volunteer opportunities${locationLabel} you can pursue now:`;
+      const intro = `Absolutely — here are ${modalityLabel}volunteer opportunities${locationLabel} to explore next:`;
+      const topMatches = matches.slice(0, 4);
+      const summaryLine = topMatches
+        .map((match) => `${match.title} (${match.commitment}, ${match.location})`)
+        .join(" • ");
 
-      const topMatches = matches.slice(0, 4).map((match, index) =>
-        `${index + 1}) ${match.title} (${match.organization}) - ${match.location}. ${match.summary} Typical commitment: ${match.commitment}.`
+      return createVolunteerReply(
+        `${intro} ${summaryLine}. I added direct links below so you can jump right in.`,
+        [IDEALIST_SOURCES[0]],
+        topMatches
       );
-
-      return createVolunteerReply(`${intro} ${topMatches.join(" ")}`, [IDEALIST_SOURCES[0]]);
     }
 
     function detectModality(input) {
