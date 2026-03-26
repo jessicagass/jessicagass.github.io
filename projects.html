@@ -365,111 +365,15 @@ while True:
     });
 
     const volunteerChatOpeners = [
-      "Hey! I’m Volunteer Finder 👋 Tell me what kind of cause, schedule, and work style you want, and I’ll help you narrow things down.",
-      "You can ask things like: 'Any remote education volunteering for 2 hours/week?' or 'Can you share real links for weekend opportunities near Chicago?'",
+      "Hey! I’m Volunteer Finder 👋 I prioritize Idealist and VolunteerMatch search links and include your requested direct Idealist opportunity link.",
+      "Share your location, cause area, and availability (for example: 'remote tutoring in Chicago on weekends') and I’ll generate focused web-search links.",
     ];
 
-    const volunteerOpportunityCatalog = [
-      {
-        title: "Hospice Tuck-In Program Volunteer",
-        organization: "Liberty HomeCare and Hospice",
-        location: "Raleigh, Cary, and surrounding areas (NC)",
-        modality: "on-site",
-        causes: ["health", "hospice", "community"],
-        commitment: "Weekend and evening support",
-        summary: "Help provide practical support and comfort-focused visits for hospice patients and families.",
-        searchKeywords: "hospice tuck in volunteer raleigh cary",
-        idealistUrl: "https://www.idealist.org/en/volunteer-opportunity/16574b144f4c4630ad6c453a694f13d7-volunteers-needed-hospice-tuck-in-program-raleigh-cary-and-surrounding-areas-liberty-homecare-and-hospice-raleigh",
-      },
-      {
-        title: "Virtual Student Mentor",
-        organization: "Education nonprofit partners",
-        location: "Remote (US)",
-        modality: "remote",
-        causes: ["education", "youth"],
-        commitment: "1-2 hours per week",
-        summary: "Mentor K-12 or first-generation students through virtual weekly check-ins and goal coaching.",
-        searchKeywords: "virtual student mentor education youth",
-        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=virtual%20student%20mentor%20education%20youth",
-      },
-      {
-        title: "Community Program Coordinator Assistant",
-        organization: "Neighborhood service organizations",
-        location: "Hybrid - major US cities",
-        modality: "hybrid",
-        causes: ["community", "human services"],
-        commitment: "Flexible weekday support",
-        summary: "Handle remote planning and communications with occasional on-site community events.",
-        searchKeywords: "community program coordinator assistant volunteer",
-        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=community%20program%20coordinator%20assistant%20volunteer",
-      },
-      {
-        title: "Grant Writing Volunteer",
-        organization: "Small and mid-size nonprofits",
-        location: "Hybrid or Remote",
-        modality: "hybrid",
-        causes: ["fundraising", "capacity building"],
-        commitment: "Project-based",
-        summary: "Draft grant narratives and budgets remotely with occasional strategy meetings.",
-        searchKeywords: "grant writing volunteer nonprofit fundraising",
-        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=grant%20writing%20volunteer%20nonprofit%20fundraising",
-      },
-      {
-        title: "Food Access Distribution Support",
-        organization: "Food banks and mutual aid programs",
-        location: "On-site - local hubs",
-        modality: "on-site",
-        causes: ["food security", "poverty"],
-        commitment: "Weekend or evening shifts",
-        summary: "Support sorting, packing, and distribution for local food-access programs.",
-        searchKeywords: "food bank volunteer distribution support",
-        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=food%20bank%20volunteer%20distribution%20support",
-      },
-      {
-        title: "Refugee and Immigrant Family Support",
-        organization: "Resettlement and legal-aid partners",
-        location: "Hybrid - local + remote",
-        modality: "hybrid",
-        causes: ["refugee support", "immigration"],
-        commitment: "2-4 hours per week",
-        summary: "Assist with remote paperwork and in-person orientation or appointment accompaniment.",
-        searchKeywords: "refugee immigrant family support volunteer",
-        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=refugee%20immigrant%20family%20support%20volunteer",
-      },
-      {
-        title: "Crisis Textline/Helpline Volunteer",
-        organization: "Mental health organizations",
-        location: "Remote or Hybrid",
-        modality: "remote",
-        causes: ["mental health", "crisis support"],
-        commitment: "Scheduled shifts",
-        summary: "Provide supervised support in text/phone programs after required training.",
-        searchKeywords: "crisis helpline volunteer mental health",
-        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=crisis%20helpline%20volunteer%20mental%20health",
-      },
-      {
-        title: "Sustainability Data & Outreach Volunteer",
-        organization: "Environmental nonprofits",
-        location: "Hybrid - city-based teams",
-        modality: "hybrid",
-        causes: ["environment", "climate"],
-        commitment: "Weekly",
-        summary: "Support impact tracking remotely and join in-person outreach events.",
-        searchKeywords: "sustainability outreach volunteer environment climate",
-        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=sustainability%20outreach%20volunteer%20environment%20climate",
-      },
-      {
-        title: "Volunteer Social Media & Storytelling",
-        organization: "Cause-driven nonprofits",
-        location: "Remote or Hybrid",
-        modality: "hybrid",
-        causes: ["communications", "advocacy"],
-        commitment: "Flexible",
-        summary: "Create posts, short videos, and campaign content with optional in-person media days.",
-        searchKeywords: "social media storytelling volunteer nonprofit",
-        idealistUrl: "https://www.idealist.org/en/volunteer-opportunities?keywords=social%20media%20storytelling%20volunteer%20nonprofit",
-      },
-    ];
+    const PRIORITY_VOLUNTEER_OPPORTUNITY = {
+      title: "Hospice Tuck-In Program Volunteer",
+      organization: "Liberty HomeCare and Hospice",
+      idealistUrl: "https://www.idealist.org/en/volunteer-opportunity/16574b144f4c4630ad6c453a694f13d7-volunteers-needed-hospice-tuck-in-program-raleigh-cary-and-surrounding-areas-liberty-homecare-and-hospice-raleigh",
+    };
 
     const IDEALIST_SOURCES = [
       {
@@ -480,48 +384,52 @@ while True:
         label: "Idealist (main site)",
         url: "https://www.idealist.org/en",
       },
+      {
+        label: "VolunteerMatch Opportunities",
+        url: "https://www.volunteermatch.org/search",
+      },
     ];
 
     const volunteerChatKnowledge = [
       {
         keywords: ["remote", "virtual", "online"],
         answer: "Remote opportunities you can target right now include virtual mentoring/tutoring, helpline support, grant writing, and nonprofit communications roles.",
-        sources: [IDEALIST_SOURCES[0]],
+        sources: [],
       },
       {
         keywords: ["near", "local", "nearby", "city", "zip", "location", "radius"],
         answer: "Local opportunities often include food-access distribution, youth mentoring, community events, and refugee support with in-person options.",
-        sources: [IDEALIST_SOURCES[0]],
+        sources: [],
       },
       {
         keywords: ["cause", "passion", "interest", "environment", "education", "animals", "health"],
         answer: "Use the Cause Areas filter to focus on topics you care about. You can select one or multiple cause areas.",
-        sources: [IDEALIST_SOURCES[0]],
+        sources: [],
       },
       {
         keywords: ["skill", "experience", "coding", "design", "writing", "language"],
         answer: "Use the Skills filter to match opportunities to what you can offer (or skills you want to build).",
-        sources: [IDEALIST_SOURCES[0]],
+        sources: [],
       },
       {
         keywords: ["date", "weekend", "time", "schedule", "newest", "recent", "recency"],
         answer: "You can filter by date/time preferences (like weekends) and sort by recency to surface newer opportunities first.",
-        sources: [IDEALIST_SOURCES[0]],
+        sources: [],
       },
       {
         keywords: ["alert", "email", "save", "saved", "notify", "notification"],
         answer: "The page recommends saving searches and enabling alerts so new matching volunteer opportunities are surfaced automatically.",
-        sources: [IDEALIST_SOURCES[0]],
+        sources: [],
       },
       {
         keywords: ["apply", "application", "how to apply"],
         answer: "Each volunteer listing has application instructions; follow the steps shown in that listing to submit successfully.",
-        sources: [IDEALIST_SOURCES[0]],
+        sources: [],
       },
       {
         keywords: ["idealist", "volunteer match", "internet", "web"],
         answer: "I’m designed to give volunteer-search guidance using Idealist Volunteer Match-style filters and broader public web search strategy.",
-        sources: IDEALIST_SOURCES,
+        sources: [],
       },
     ];
 
@@ -620,14 +528,20 @@ while True:
       const matches = volunteerChatKnowledge.filter((entry) =>
         entry.keywords.some((keyword) => input.includes(keyword))
       );
+      const sourceLinks = buildVolunteerSearchSources(question);
 
       if (!matches.length) {
-        return createVolunteerReply("Great question — I can help best when you share a few details. Tell me your location, remote/hybrid/on-site preference, cause area, and weekly availability, and I’ll suggest specific matches.");
+        return createVolunteerReply(
+          "Great question — I can help best when you share location, remote/hybrid/on-site preference, cause area, and weekly availability.",
+          sourceLinks,
+          [PRIORITY_VOLUNTEER_OPPORTUNITY]
+        );
       }
 
       return createVolunteerReply(
-        matches.map((entry) => entry.answer).join(" "),
-        [...new Map(matches.flatMap((entry) => (entry.sources || []).map((source) => [source.url, source]))).values()]
+        `${matches.map((entry) => entry.answer).join(" ")} I included current search links below with Idealist and VolunteerMatch priority.`,
+        sourceLinks,
+        [PRIORITY_VOLUNTEER_OPPORTUNITY]
       );
     }
 
@@ -639,27 +553,17 @@ while True:
         return "";
       }
 
-      const modality = detectModality(input);
-      const location = detectLocation(input);
-      const cause = detectCause(input);
-      const matches = findOpportunityMatches({ modality, cause });
-
-      if (!matches.length) {
-        return createVolunteerReply("I couldn’t find a close fit in my built-in guide yet. Try asking for remote, hybrid, or on-site roles and include a cause area (like education, environment, or mental health), and I’ll refine it.", [IDEALIST_SOURCES[0]]);
-      }
-
+      const modality = detectModality(input) || "any";
+      const location = detectLocation(input) || "your area";
+      const cause = detectCause(input) || "your preferred cause area";
+      const sourceLinks = buildVolunteerSearchSources(input);
       const locationLabel = location ? ` near ${location}` : "";
-      const modalityLabel = modality ? `${modality} ` : "";
-      const intro = `Absolutely — here are ${modalityLabel}volunteer opportunities${locationLabel} to explore next:`;
-      const topMatches = matches.slice(0, 4);
-      const summaryLine = topMatches
-        .map((match) => `${match.title} (${match.commitment}, ${match.location})`)
-        .join(" • ");
+      const intro = `Absolutely — I prioritized Idealist VolunteerMatch-style searching for ${modality} opportunities${locationLabel}.`;
 
       return createVolunteerReply(
-        `${intro} ${summaryLine}. I added direct links below so you can jump right in.`,
-        [IDEALIST_SOURCES[0]],
-        topMatches
+        `${intro} I also used "${cause}" in the query and included your requested direct opportunity link plus live search links below.`,
+        sourceLinks,
+        [PRIORITY_VOLUNTEER_OPPORTUNITY]
       );
     }
 
@@ -671,6 +575,36 @@ while True:
       const url = new URL("https://www.idealist.org/en/volunteer-opportunities");
       url.searchParams.set("keywords", query);
       return url.toString();
+    }
+
+    function buildVolunteerSearchSources(question) {
+      const searchText = normalizeSearchTerms(question);
+      const idealistUrl = new URL("https://www.idealist.org/en/volunteer-opportunities");
+      idealistUrl.searchParams.set("keywords", searchText);
+
+      const volunteerMatchUrl = new URL("https://www.volunteermatch.org/search");
+      volunteerMatchUrl.searchParams.set("l", "United States");
+      volunteerMatchUrl.searchParams.set("k", searchText);
+
+      return [
+        {
+          label: "Idealist (priority search)",
+          url: idealistUrl.toString(),
+        },
+        {
+          label: "VolunteerMatch search",
+          url: volunteerMatchUrl.toString(),
+        },
+      ];
+    }
+
+    function normalizeSearchTerms(rawQuestion) {
+      const cleaned = (rawQuestion || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      return cleaned || "volunteer opportunities";
     }
 
     function detectModality(input) {
@@ -699,30 +633,6 @@ while True:
       const locationPattern = /\b(?:in|near|around|at)\s+([a-z\s]+?)(?:\?|$|,|\.| for | with )/i;
       const match = input.match(locationPattern);
       return match ? match[1].trim().replace(/\s+/g, " ") : "";
-    }
-
-    function findOpportunityMatches(preferences) {
-      const scored = volunteerOpportunityCatalog.map((item) => {
-        let score = 0;
-
-        if (!preferences.modality || item.modality === preferences.modality || item.modality === "hybrid") {
-          score += 2;
-        }
-
-        if (preferences.cause && item.causes.join(" ").includes(preferences.cause)) {
-          score += 3;
-        }
-
-        if (!preferences.cause) {
-          score += 1;
-        }
-
-        return { ...item, score };
-      });
-
-      return scored
-        .filter((item) => item.score >= 2)
-        .sort((a, b) => b.score - a.score);
     }
 
     function resetVolunteerChat() {

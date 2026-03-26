@@ -739,30 +739,32 @@ footer {
 
 .volunteer-chat-message {
   margin: 0;
-  padding: 0.6rem 0.8rem;
+  padding: 0.7rem 0.9rem;
   border-radius: 16px;
   line-height: 1.45;
   max-width: min(83%, 560px);
+  word-break: break-word;
 }
 
 .volunteer-chat-author {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 0.2rem;
-  opacity: 0.75;
+  margin-bottom: 0.3rem;
+  opacity: 0.9;
 }
 
 .volunteer-chat-text {
   margin: 0;
+  font-size: 0.98rem;
 }
 
 .volunteer-chat-message.bot {
   justify-self: flex-start;
   background: #fff;
   border: 1px solid var(--border);
-  color: var(--muted);
+  color: #18363f;
 }
 
 .volunteer-chat-message.user {
