@@ -37,7 +37,7 @@
       <div class="section-inner">
         <h2>Featured Projects</h2>
         <div class="cards project-showcase">
-          <details class="card project-card" open>
+          <details class="card project-card">
             <summary class="project-card-summary">
               <div>
                 <h3>Outlook Recurring Email Scheduler</h3>
@@ -369,6 +369,81 @@ while True:
       "Try asking things like: 'How do I automate the Outlook script?', 'What settings are in the project scheduler?', or 'How do I find remote volunteer roles?'",
     ];
 
+    const volunteerOpportunityCatalog = [
+      {
+        title: "Virtual Student Mentor",
+        organization: "Education nonprofit partners",
+        location: "Remote (US)",
+        modality: "remote",
+        causes: ["education", "youth"],
+        commitment: "1-2 hours per week",
+        summary: "Mentor K-12 or first-generation students through virtual weekly check-ins and goal coaching.",
+      },
+      {
+        title: "Community Program Coordinator Assistant",
+        organization: "Neighborhood service organizations",
+        location: "Hybrid - major US cities",
+        modality: "hybrid",
+        causes: ["community", "human services"],
+        commitment: "Flexible weekday support",
+        summary: "Handle remote planning and communications with occasional on-site community events.",
+      },
+      {
+        title: "Grant Writing Volunteer",
+        organization: "Small and mid-size nonprofits",
+        location: "Hybrid or Remote",
+        modality: "hybrid",
+        causes: ["fundraising", "capacity building"],
+        commitment: "Project-based",
+        summary: "Draft grant narratives and budgets remotely with occasional strategy meetings.",
+      },
+      {
+        title: "Food Access Distribution Support",
+        organization: "Food banks and mutual aid programs",
+        location: "On-site - local hubs",
+        modality: "on-site",
+        causes: ["food security", "poverty"],
+        commitment: "Weekend or evening shifts",
+        summary: "Support sorting, packing, and distribution for local food-access programs.",
+      },
+      {
+        title: "Refugee and Immigrant Family Support",
+        organization: "Resettlement and legal-aid partners",
+        location: "Hybrid - local + remote",
+        modality: "hybrid",
+        causes: ["refugee support", "immigration"],
+        commitment: "2-4 hours per week",
+        summary: "Assist with remote paperwork and in-person orientation or appointment accompaniment.",
+      },
+      {
+        title: "Crisis Textline/Helpline Volunteer",
+        organization: "Mental health organizations",
+        location: "Remote or Hybrid",
+        modality: "remote",
+        causes: ["mental health", "crisis support"],
+        commitment: "Scheduled shifts",
+        summary: "Provide supervised support in text/phone programs after required training.",
+      },
+      {
+        title: "Sustainability Data & Outreach Volunteer",
+        organization: "Environmental nonprofits",
+        location: "Hybrid - city-based teams",
+        modality: "hybrid",
+        causes: ["environment", "climate"],
+        commitment: "Weekly",
+        summary: "Support impact tracking remotely and join in-person outreach events.",
+      },
+      {
+        title: "Volunteer Social Media & Storytelling",
+        organization: "Cause-driven nonprofits",
+        location: "Remote or Hybrid",
+        modality: "hybrid",
+        causes: ["communications", "advocacy"],
+        commitment: "Flexible",
+        summary: "Create posts, short videos, and campaign content with optional in-person media days.",
+      },
+    ];
+
     const volunteerChatKnowledge = [
       {
         keywords: ["projects", "project page", "what is on this page", "featured projects", "what tools"],
@@ -400,11 +475,11 @@ while True:
       },
       {
         keywords: ["remote", "virtual", "online"],
-        answer: "For remote opportunities, use filters for remote/virtual roles so your results focus on online options.",
+        answer: "Remote opportunities you can target right now include virtual mentoring/tutoring, helpline support, grant writing, and nonprofit communications roles.",
       },
       {
         keywords: ["near", "local", "nearby", "city", "zip", "location", "radius"],
-        answer: "For local opportunities, use city or ZIP with a travel radius to narrow on-site or hybrid roles near you.",
+        answer: "Local opportunities often include food-access distribution, youth mentoring, community events, and refugee support with in-person options.",
       },
       {
         keywords: ["cause", "passion", "interest", "environment", "education", "animals", "health"],
@@ -448,6 +523,12 @@ while True:
 
     function getVolunteerBotReply(question) {
       const input = question.toLowerCase();
+      const dynamicOpportunityReply = getIdealistStyleOpportunityReply(input);
+
+      if (dynamicOpportunityReply) {
+        return dynamicOpportunityReply;
+      }
+
       const matches = volunteerChatKnowledge.filter((entry) =>
         entry.keywords.some((keyword) => input.includes(keyword))
       );
@@ -457,6 +538,86 @@ while True:
       }
 
       return matches.map((entry) => entry.answer).join(" ");
+    }
+
+    function getIdealistStyleOpportunityReply(input) {
+      const opportunityIntentKeywords = ["opportunit", "volunteer", "role", "opening", "position", "find"];
+      const hasOpportunityIntent = opportunityIntentKeywords.some((keyword) => input.includes(keyword));
+
+      if (!hasOpportunityIntent) {
+        return "";
+      }
+
+      const modality = detectModality(input);
+      const location = detectLocation(input);
+      const cause = detectCause(input);
+      const matches = findOpportunityMatches({ modality, cause });
+
+      if (!matches.length) {
+        return "I could not find a close match in the built-in opportunity guide. Try asking for remote, hybrid, or on-site opportunities and include a cause area like education, environment, or mental health.";
+      }
+
+      const locationLabel = location ? ` near ${location}` : "";
+      const modalityLabel = modality ? `${modality} ` : "";
+      const intro = `Here are ${modalityLabel}volunteer opportunities${locationLabel} you can pursue now:`;
+
+      const topMatches = matches.slice(0, 4).map((match, index) =>
+        `${index + 1}) ${match.title} (${match.organization}) - ${match.location}. ${match.summary} Typical commitment: ${match.commitment}.`
+      );
+
+      return `${intro} ${topMatches.join(" ")}`;
+    }
+
+    function detectModality(input) {
+      if (input.includes("hybrid")) return "hybrid";
+      if (input.includes("remote") || input.includes("virtual") || input.includes("online")) return "remote";
+      if (input.includes("on-site") || input.includes("onsite") || input.includes("in person")) return "on-site";
+      return "";
+    }
+
+    function detectCause(input) {
+      const causeKeywords = {
+        education: ["education", "school", "tutor", "student", "youth"],
+        environment: ["environment", "climate", "sustainability"],
+        "mental health": ["mental health", "crisis", "helpline"],
+        immigration: ["immigrant", "immigration", "refugee"],
+        "food security": ["food", "hunger", "food bank"],
+        communications: ["communications", "social media", "marketing", "storytelling"],
+      };
+
+      return Object.entries(causeKeywords).find(([, keywords]) =>
+        keywords.some((keyword) => input.includes(keyword))
+      )?.[0] || "";
+    }
+
+    function detectLocation(input) {
+      const locationPattern = /\b(?:in|near|around|at)\s+([a-z\s]+?)(?:\?|$|,|\.| for | with )/i;
+      const match = input.match(locationPattern);
+      return match ? match[1].trim().replace(/\s+/g, " ") : "";
+    }
+
+    function findOpportunityMatches(preferences) {
+      const scored = volunteerOpportunityCatalog.map((item) => {
+        let score = 0;
+
+        if (!preferences.modality || item.modality === preferences.modality || item.modality === "hybrid") {
+          score += 2;
+        }
+
+        if (preferences.cause && item.causes.join(" ").includes(preferences.cause)) {
+          score += 3;
+        }
+
+        if (!preferences.cause) {
+          score += 1;
+        }
+
+        return { ...item, score };
+      });
+
+      return scored
+        .filter((item) => item.score >= 2)
+        .sort((a, b) => b.score - a.score);
     }
 
     function resetVolunteerChat() {
