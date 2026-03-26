@@ -444,38 +444,57 @@ while True:
       },
     ];
 
+    const IDEALIST_SOURCES = [
+      {
+        label: "Idealist Volunteer Opportunities",
+        url: "https://www.idealist.org/en/volunteer-opportunities",
+      },
+      {
+        label: "Idealist (main site)",
+        url: "https://www.idealist.org/en",
+      },
+    ];
+
     const volunteerChatKnowledge = [
       {
         keywords: ["remote", "virtual", "online"],
         answer: "Remote opportunities you can target right now include virtual mentoring/tutoring, helpline support, grant writing, and nonprofit communications roles.",
+        sources: [IDEALIST_SOURCES[0]],
       },
       {
         keywords: ["near", "local", "nearby", "city", "zip", "location", "radius"],
         answer: "Local opportunities often include food-access distribution, youth mentoring, community events, and refugee support with in-person options.",
+        sources: [IDEALIST_SOURCES[0]],
       },
       {
         keywords: ["cause", "passion", "interest", "environment", "education", "animals", "health"],
         answer: "Use the Cause Areas filter to focus on topics you care about. You can select one or multiple cause areas.",
+        sources: [IDEALIST_SOURCES[0]],
       },
       {
         keywords: ["skill", "experience", "coding", "design", "writing", "language"],
         answer: "Use the Skills filter to match opportunities to what you can offer (or skills you want to build).",
+        sources: [IDEALIST_SOURCES[0]],
       },
       {
         keywords: ["date", "weekend", "time", "schedule", "newest", "recent", "recency"],
         answer: "You can filter by date/time preferences (like weekends) and sort by recency to surface newer opportunities first.",
+        sources: [IDEALIST_SOURCES[0]],
       },
       {
         keywords: ["alert", "email", "save", "saved", "notify", "notification"],
         answer: "The page recommends saving searches and enabling alerts so new matching volunteer opportunities are surfaced automatically.",
+        sources: [IDEALIST_SOURCES[0]],
       },
       {
         keywords: ["apply", "application", "how to apply"],
         answer: "Each volunteer listing has application instructions; follow the steps shown in that listing to submit successfully.",
+        sources: [IDEALIST_SOURCES[0]],
       },
       {
         keywords: ["idealist", "volunteer match", "internet", "web"],
         answer: "I’m designed to give volunteer-search guidance using Idealist Volunteer Match-style filters and broader public web search strategy.",
+        sources: IDEALIST_SOURCES,
       },
     ];
 
@@ -497,7 +516,11 @@ while True:
       return projectTerms.some((term) => input.includes(term));
     }
 
-    function appendVolunteerChatMessage(role, text) {
+    function createVolunteerReply(text, sources = []) {
+      return { text, sources };
+    }
+
+    function appendVolunteerChatMessage(role, content) {
       const message = document.createElement("div");
       message.className = `volunteer-chat-message ${role}`;
       const roleLabel = role === "bot" ? "Volunteer Finder" : "You";
@@ -508,9 +531,31 @@ while True:
 
       const body = document.createElement("p");
       body.className = "volunteer-chat-text";
-      body.textContent = text;
+      const payload = typeof content === "string" ? createVolunteerReply(content) : content;
+      body.textContent = payload.text;
 
       message.append(author, body);
+
+      if (role === "bot" && payload.sources?.length) {
+        const sourceWrapper = document.createElement("p");
+        sourceWrapper.className = "volunteer-chat-text";
+        sourceWrapper.append("Source: ");
+
+        payload.sources.forEach((source, index) => {
+          const link = document.createElement("a");
+          link.href = source.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = source.label;
+          sourceWrapper.append(link);
+
+          if (index < payload.sources.length - 1) {
+            sourceWrapper.append(", ");
+          }
+        });
+
+        message.append(sourceWrapper);
+      }
       volunteerChatLog.appendChild(message);
       volunteerChatLog.scrollTop = volunteerChatLog.scrollHeight;
     }
@@ -518,7 +563,7 @@ while True:
     function getVolunteerBotReply(question) {
       const input = question.toLowerCase();
       if (isProjectPageQuestion(input)) {
-        return "I’m focused on volunteer opportunities, not questions about the Projects page tools. Ask me about location, remote/hybrid preferences, cause areas, skills, and availability to find good volunteer matches.";
+        return createVolunteerReply("I’m focused on volunteer opportunities, not questions about the Projects page tools. Ask me about location, remote/hybrid preferences, cause areas, skills, and availability to find good volunteer matches.");
       }
 
       const dynamicOpportunityReply = getIdealistStyleOpportunityReply(input);
@@ -532,10 +577,13 @@ while True:
       );
 
       if (!matches.length) {
-        return "I focus on volunteer opportunities. Try including details like location, remote/hybrid preference, cause area, skills, and time commitment so I can suggest stronger matches.";
+        return createVolunteerReply("I focus on volunteer opportunities. Try including details like location, remote/hybrid preference, cause area, skills, and time commitment so I can suggest stronger matches.");
       }
 
-      return matches.map((entry) => entry.answer).join(" ");
+      return createVolunteerReply(
+        matches.map((entry) => entry.answer).join(" "),
+        [...new Map(matches.flatMap((entry) => (entry.sources || []).map((source) => [source.url, source]))).values()]
+      );
     }
 
     function getIdealistStyleOpportunityReply(input) {
@@ -552,7 +600,7 @@ while True:
       const matches = findOpportunityMatches({ modality, cause });
 
       if (!matches.length) {
-        return "I could not find a close match in the built-in opportunity guide. Try asking for remote, hybrid, or on-site opportunities and include a cause area like education, environment, or mental health.";
+        return createVolunteerReply("I could not find a close match in the built-in opportunity guide. Try asking for remote, hybrid, or on-site opportunities and include a cause area like education, environment, or mental health.", [IDEALIST_SOURCES[0]]);
       }
 
       const locationLabel = location ? ` near ${location}` : "";
@@ -563,7 +611,7 @@ while True:
         `${index + 1}) ${match.title} (${match.organization}) - ${match.location}. ${match.summary} Typical commitment: ${match.commitment}.`
       );
 
-      return `${intro} ${topMatches.join(" ")}`;
+      return createVolunteerReply(`${intro} ${topMatches.join(" ")}`, [IDEALIST_SOURCES[0]]);
     }
 
     function detectModality(input) {
