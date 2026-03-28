@@ -160,7 +160,7 @@
             </div>
           </details>
 
-          <details class="card project-card volunteer-chatbot-card">
+          <details class="card project-card github-chatbot-card">
             <summary class="project-card-summary">
               <div>
                 <h3>GitHub Website Navigator Chatbot</h3>
@@ -171,8 +171,8 @@
               <span class="project-card-toggle" aria-hidden="true">Expand project</span>
             </summary>
 
-            <div class="project-card-body volunteer-chatbot-body">
-              <div class="panel volunteer-chatbot-panel">
+            <div class="project-card-body github-chatbot-body">
+              <div class="panel github-chatbot-panel">
                 <h2>Ask the GitHub Navigator chatbot</h2>
                 <p class="lead">
                   Ask where to click on GitHub.com for common tasks, how to create a new GitHub Pages page, or for starter code snippets (navbar, dropdown menu, and CSS setup).
@@ -187,7 +187,7 @@
                     </div>
                   </div>
 
-                  <div id="volunteerChatLog" class="volunteer-chat-log" aria-live="polite"></div>
+                  <div id="githubChatLog" class="github-chat-log" aria-live="polite"></div>
                   <div class="chatbox-prompts" aria-label="Chat examples">
                     <button type="button" class="prompt-chip" data-prompt="How do I create a new page for my GitHub Pages site?">New page on GitHub Pages</button>
                     <button type="button" class="prompt-chip" data-prompt="Give me basic HTML and CSS for a responsive navbar.">Navbar starter code</button>
@@ -195,11 +195,11 @@
                     <button type="button" class="prompt-chip" data-prompt="How should I organize styles.css for a website?">styles.css structure</button>
                   </div>
 
-                  <form id="volunteerChatForm" class="volunteer-chat-form">
-                    <label for="volunteerChatInput" class="visually-hidden">Your message</label>
+                  <form id="githubChatForm" class="github-chat-form">
+                    <label for="githubChatInput" class="visually-hidden">Your message</label>
                     <input
-                      id="volunteerChatInput"
-                      name="volunteerChatInput"
+                      id="githubChatInput"
+                      name="githubChatInput"
                       type="text"
                       placeholder="Type your message..."
                       autocomplete="off"
@@ -207,7 +207,7 @@
                     >
                     <div class="inline-actions chatbox-actions">
                       <button type="submit" class="button">Send</button>
-                      <button type="button" id="volunteerChatReset" class="button-secondary">Clear</button>
+                      <button type="button" id="githubChatReset" class="button-secondary">Clear</button>
                     </div>
                   </form>
                   </div>
@@ -276,10 +276,10 @@ while True:
     const resetScheduleBtn = document.getElementById("resetScheduleBtn");
     const calendarEl = document.getElementById("calendar");
     const schedulerStatus = document.getElementById("schedulerStatus");
-    const volunteerChatForm = document.getElementById("volunteerChatForm");
-    const volunteerChatInput = document.getElementById("volunteerChatInput");
-    const volunteerChatLog = document.getElementById("volunteerChatLog");
-    const volunteerChatResetBtn = document.getElementById("volunteerChatReset");
+    const githubChatForm = document.getElementById("githubChatForm");
+    const githubChatInput = document.getElementById("githubChatInput");
+    const githubChatLog = document.getElementById("githubChatLog");
+    const githubChatResetBtn = document.getElementById("githubChatReset");
     const chatPromptButtons = document.querySelectorAll(".prompt-chip");
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
     const WEEKDAY_INDEX = {
@@ -371,9 +371,9 @@ while True:
       resetScheduler();
     });
 
-    const volunteerChatOpeners = [
+    const githubChatOpeners = [
       "Hey! I’m GitHub Navigator 👋 Ask me where to click on GitHub.com and I’ll map out the fastest path.",
-      "Try prompts like: 'How do I open pull requests?', 'Where are repository settings?', or 'How can I find Actions logs?'.",
+      "Try prompts like: 'How do I open pull requests?', 'How do I clone a repo?', 'Where are repository settings?', or 'How can I resolve merge conflicts?'.",
     ];
 
     const githubDocsHome = { label: "GitHub Docs", url: "https://docs.github.com" };
@@ -432,6 +432,20 @@ while True:
         answer: "A GitHub Actions workflow is an automated process defined in YAML files inside .github/workflows. Workflows can run tests, builds, deployments, and other tasks based on events.",
         sources: [
           { label: "Understanding GitHub Actions", url: "https://docs.github.com/actions/learn-github-actions/understanding-github-actions" },
+        ],
+      },
+      {
+        terms: ["merge conflict", "conflict"],
+        answer: "A merge conflict happens when GitHub cannot automatically combine changes from different branches because overlapping lines were edited differently. You need to choose or combine changes before merging.",
+        sources: [
+          { label: "Resolving a merge conflict on GitHub", url: "https://docs.github.com/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts/resolving-a-merge-conflict-on-github" },
+        ],
+      },
+      {
+        terms: ["gitignore", ".gitignore"],
+        answer: "A .gitignore file tells Git which files and folders should not be tracked, such as build output, secrets, and local environment files.",
+        sources: [
+          { label: "Ignoring files", url: "https://docs.github.com/get-started/getting-started-with-git/ignoring-files" },
         ],
       },
     ];
@@ -499,6 +513,49 @@ while True:
           { label: "Notifications docs", url: "https://docs.github.com/account-and-profile/managing-subscriptions-and-notifications-on-github" },
         ],
       },
+      {
+        keywords: ["clone", "clone repo", "git clone"],
+        answer: "Open the repository Code tab, click the green Code button, then copy the HTTPS, SSH, or CLI URL to clone locally.",
+        paths: [
+          { label: "Cloning a repository", url: "https://docs.github.com/repositories/creating-and-managing-repositories/cloning-a-repository" },
+        ],
+      },
+      {
+        keywords: ["push", "commit and push", "upload code", "publish code"],
+        answer: "Commit changes locally, then push your branch to GitHub. If prompted, authenticate with your GitHub credentials or a personal access token.",
+        paths: [
+          { label: "Pushing commits to a remote repository", url: "https://docs.github.com/get-started/using-git/pushing-commits-to-a-remote-repository" },
+          { label: "Managing your personal access tokens", url: "https://docs.github.com/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens" },
+        ],
+      },
+      {
+        keywords: ["merge conflict", "conflict", "resolve conflict"],
+        answer: "When a pull request has conflicts, open it and use Resolve conflicts (if available) or fix conflicts locally and push the updated branch.",
+        paths: [
+          { label: "Resolving merge conflicts", url: "https://docs.github.com/pull-requests/collaborating-with-pull-requests/addressing-merge-conflicts" },
+        ],
+      },
+      {
+        keywords: ["private repo", "public repo", "visibility", "change visibility"],
+        answer: "To change repository visibility, open Settings > General, then find the Danger Zone visibility options and confirm the change.",
+        paths: [
+          { label: "Setting repository visibility", url: "https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/setting-repository-visibility" },
+        ],
+      },
+      {
+        keywords: ["2fa", "two factor", "two-factor", "authentication app", "security key"],
+        answer: "Enable two-factor authentication from your account security settings, then verify with an authenticator app, security key, or supported method.",
+        paths: [
+          { label: "Configuring 2FA", url: "https://docs.github.com/authentication/securing-your-account-with-two-factor-authentication-2fa/configuring-two-factor-authentication" },
+        ],
+      },
+      {
+        keywords: ["collaborator", "invite collaborator", "add collaborator", "manage access"],
+        answer: "In a repository, open Settings > Collaborators and teams (or Manage access), then invite people or teams and assign permission levels.",
+        paths: [
+          { label: "Inviting collaborators", url: "https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/managing-repository-settings/inviting-collaborators-to-a-personal-repository" },
+        ],
+      },
     ];
 
     const starterCodeSnippets = {
@@ -557,29 +614,29 @@ body {
 }`,
     };
 
-    function createVolunteerReply(text, sources = [], actions = [], code = "") {
+    function createGitHubReply(text, sources = [], actions = [], code = "") {
       return { text, sources, actions, code };
     }
 
-    function appendVolunteerChatMessage(role, content) {
+    function appendGitHubChatMessage(role, content) {
       const message = document.createElement("div");
-      message.className = `volunteer-chat-message ${role}`;
+      message.className = `github-chat-message ${role}`;
       const roleLabel = role === "bot" ? "GitHub Navigator" : "You";
 
       const author = document.createElement("span");
-      author.className = "volunteer-chat-author";
+      author.className = "github-chat-author";
       author.textContent = roleLabel;
 
       const body = document.createElement("p");
-      body.className = "volunteer-chat-text";
-      const payload = typeof content === "string" ? createVolunteerReply(content) : content;
+      body.className = "github-chat-text";
+      const payload = typeof content === "string" ? createGitHubReply(content) : content;
       body.textContent = payload.text;
 
       message.append(author, body);
 
       if (role === "bot" && payload.code) {
         const codeBlock = document.createElement("pre");
-        codeBlock.className = "volunteer-chat-code";
+        codeBlock.className = "github-chat-code";
         const codeContent = document.createElement("code");
         codeContent.textContent = payload.code;
         codeBlock.append(codeContent);
@@ -588,7 +645,7 @@ body {
 
       if (role === "bot" && payload.actions?.length) {
         const opportunityList = document.createElement("ul");
-        opportunityList.className = "volunteer-opportunity-links";
+        opportunityList.className = "github-chat-actions";
 
         payload.actions.forEach((action, index) => {
           const item = document.createElement("li");
@@ -601,7 +658,7 @@ body {
 
       if (role === "bot" && payload.sources?.length) {
         const sourceWrapper = document.createElement("p");
-        sourceWrapper.className = "volunteer-chat-text";
+        sourceWrapper.className = "github-chat-text";
         sourceWrapper.append("Source: ");
 
         payload.sources.forEach((source, index) => {
@@ -619,11 +676,11 @@ body {
 
         message.append(sourceWrapper);
       }
-      volunteerChatLog.appendChild(message);
-      volunteerChatLog.scrollTop = volunteerChatLog.scrollHeight;
+      githubChatLog.appendChild(message);
+      githubChatLog.scrollTop = githubChatLog.scrollHeight;
     }
 
-    function getVolunteerBotReply(question) {
+    function getGitHubBotReply(question) {
       const input = question.toLowerCase();
       const normalizedInput = normalizeSearchTerms(input);
       const definitionMatch = findDefinitionMatch(normalizedInput);
@@ -633,7 +690,7 @@ body {
       const sourceLinks = buildGitHubSources(normalizedInput, matches);
 
       if (definitionMatch && isDefinitionQuestion(normalizedInput)) {
-        return createVolunteerReply(
+        return createGitHubReply(
           definitionMatch.answer,
           [githubDocsHome, ...(definitionMatch.sources || [])],
           [
@@ -644,7 +701,7 @@ body {
       }
 
       if (isGitHubPagesQuestion(normalizedInput)) {
-        return createVolunteerReply(
+        return createGitHubReply(
           "To add a new page on GitHub Pages: create a new .html file in your site repository, add it to your navigation links, commit the change, and wait for Pages to rebuild. You can also create pages directly in the GitHub web editor from Add file > Create new file.",
           [
             { label: "GitHub Pages docs", url: "https://docs.github.com/pages" },
@@ -660,7 +717,7 @@ body {
       }
 
       if (isNavbarQuestion(normalizedInput)) {
-        return createVolunteerReply(
+        return createGitHubReply(
           "Here is a simple responsive navbar starter. Use the same links across your pages so navigation stays consistent.",
           [{ label: "HTML basics", url: "https://developer.mozilla.org/docs/Learn_web_development/Core/Structuring_content/Basic_HTML_syntax" }],
           ["Paste this into your page and adapt link paths for your site structure."],
@@ -669,7 +726,7 @@ body {
       }
 
       if (isDropdownQuestion(normalizedInput)) {
-        return createVolunteerReply(
+        return createGitHubReply(
           "This dropdown starter includes a small JavaScript toggle and accessible aria-expanded handling.",
           [{ label: "ARIA authoring practices", url: "https://www.w3.org/WAI/ARIA/apg/" }],
           ["Style .dropdown-menu with position:absolute if you want it to open below the button."],
@@ -678,7 +735,7 @@ body {
       }
 
       if (isStylesheetQuestion(normalizedInput)) {
-        return createVolunteerReply(
+        return createGitHubReply(
           "This styles.css starter gives you a clean foundation with color variables, body defaults, and reusable utility classes.",
           [{ label: "CSS reference", url: "https://developer.mozilla.org/docs/Web/CSS/Reference" }],
           ["Keep variables at the top and group rules by layout, components, and utilities."],
@@ -688,7 +745,7 @@ body {
 
       if (!matches.length) {
         if (definitionMatch) {
-          return createVolunteerReply(
+          return createGitHubReply(
             definitionMatch.answer,
             [githubDocsHome, ...(definitionMatch.sources || [])],
             [
@@ -697,18 +754,19 @@ body {
           );
         }
 
-        return createVolunteerReply(
-          "I can help with GitHub navigation and basic website setup. Ask me how to create a new GitHub Pages page or request starter code for a navbar, dropdown menu, or styles.css file.",
+        return createGitHubReply(
+          "I can help with GitHub navigation and basic website setup. Ask about GitHub Pages, cloning, pushing commits, pull requests, merge conflicts, repository visibility, collaborators, or starter code for a navbar/dropdown/styles.css.",
           [githubDocsHome, ...sourceLinks],
           [
             "Open github.com and sign in.",
             "Use the top search bar to locate the repository or user.",
             "Use repository tabs (Code, Issues, Pull requests, Actions, Settings) to complete your task.",
+            "Ask for a step-by-step path and I’ll provide click-by-click navigation.",
           ]
         );
       }
 
-      return createVolunteerReply(
+      return createGitHubReply(
         matches.map((entry) => entry.answer).join(" "),
         sourceLinks,
         buildGitHubActionSteps(input, matches[0])
@@ -738,6 +796,15 @@ body {
       }
       if (match.keywords.includes("actions")) {
         return [...baseSteps, "Open Actions.", "Select a workflow run to inspect job logs."];
+      }
+      if (match.keywords.includes("clone")) {
+        return [...baseSteps, "Open Code.", "Click the green Code button and copy HTTPS, SSH, or GitHub CLI URL."];
+      }
+      if (match.keywords.includes("push")) {
+        return [...baseSteps, "Commit locally on your branch.", "Run git push origin <branch-name> and verify the branch appears on GitHub."];
+      }
+      if (match.keywords.includes("conflict")) {
+        return [...baseSteps, "Open the pull request and check the conflict warning.", "Use Resolve conflicts or fix locally, then push the branch again."];
       }
       if (match.keywords.includes("settings")) {
         return [...baseSteps, "Open Settings.", "Choose the specific settings section from the left sidebar."];
@@ -825,28 +892,28 @@ body {
       return match ? match[1].trim().replace(/\s+/g, " ") : "";
     }
 
-    function resetVolunteerChat() {
-      volunteerChatLog.innerHTML = "";
-      volunteerChatOpeners.forEach((message) => appendVolunteerChatMessage("bot", message));
+    function resetGitHubChat() {
+      githubChatLog.innerHTML = "";
+      githubChatOpeners.forEach((message) => appendGitHubChatMessage("bot", message));
     }
 
-    volunteerChatForm.addEventListener("submit", (event) => {
+    githubChatForm.addEventListener("submit", (event) => {
       event.preventDefault();
-      const question = volunteerChatInput.value.trim();
+      const question = githubChatInput.value.trim();
 
       if (!question) {
         return;
       }
 
-      appendVolunteerChatMessage("user", question);
-      appendVolunteerChatMessage("bot", getVolunteerBotReply(question));
-      volunteerChatInput.value = "";
-      volunteerChatInput.focus();
+      appendGitHubChatMessage("user", question);
+      appendGitHubChatMessage("bot", getGitHubBotReply(question));
+      githubChatInput.value = "";
+      githubChatInput.focus();
     });
 
-    volunteerChatResetBtn.addEventListener("click", () => {
-      resetVolunteerChat();
-      volunteerChatInput.focus();
+    githubChatResetBtn.addEventListener("click", () => {
+      resetGitHubChat();
+      githubChatInput.focus();
     });
 
     chatPromptButtons.forEach((button) => {
@@ -855,8 +922,8 @@ body {
         if (!prompt) {
           return;
         }
-        volunteerChatInput.value = prompt;
-        volunteerChatInput.focus();
+        githubChatInput.value = prompt;
+        githubChatInput.focus();
       });
     });
 
@@ -1328,7 +1395,7 @@ body {
 
     restoreSchedulerState();
     renderCalendar(projects.length ? "Saved schedule restored." : "");
-    resetVolunteerChat();
+    resetGitHubChat();
   </script>
 
 </body>

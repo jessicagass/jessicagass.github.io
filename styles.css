@@ -675,11 +675,11 @@ footer {
   margin-top: 1.5rem;
 }
 
-.volunteer-chatbot-body {
+.github-chatbot-body {
   padding: 0;
 }
 
-.volunteer-chatbot-panel {
+.github-chatbot-panel {
   padding: clamp(1.5rem, 3vw, 2rem);
   border: 0;
   border-radius: 0;
@@ -726,7 +726,7 @@ footer {
   color: var(--muted);
 }
 
-.volunteer-chat-log {
+.github-chat-log {
   max-height: 360px;
   overflow-y: auto;
   padding: 1rem 0.95rem;
@@ -765,7 +765,7 @@ footer {
   outline: none;
 }
 
-.volunteer-chat-message {
+.github-chat-message {
   margin: 0;
   padding: 0.7rem 0.9rem;
   border-radius: 16px;
@@ -774,7 +774,7 @@ footer {
   word-break: break-word;
 }
 
-.volunteer-chat-author {
+.github-chat-author {
   display: block;
   font-size: 0.76rem;
   text-transform: uppercase;
@@ -783,12 +783,12 @@ footer {
   opacity: 0.9;
 }
 
-.volunteer-chat-text {
+.github-chat-text {
   margin: 0;
   font-size: 0.98rem;
 }
 
-.volunteer-chat-code {
+.github-chat-code {
   margin: 0.7rem 0 0;
   padding: 0.75rem 0.85rem;
   border-radius: 12px;
@@ -799,67 +799,67 @@ footer {
   overflow-x: auto;
 }
 
-.volunteer-chat-message.bot {
+.github-chat-message.bot {
   justify-self: flex-start;
   background: #fff;
   border: 1px solid var(--border);
   color: #18363f;
 }
 
-.volunteer-chat-message.user {
+.github-chat-message.user {
   justify-self: flex-end;
   background: #1f5d63;
   color: #ffffff;
 }
 
-.volunteer-chat-message.user .volunteer-chat-author {
+.github-chat-message.user .github-chat-author {
   opacity: 1;
   color: #ffffff;
 }
 
-.volunteer-chat-message.user .volunteer-chat-text {
+.github-chat-message.user .github-chat-text {
   font-weight: 600;
   color: #ffffff;
 }
 
-.volunteer-chat-message.user a {
+.github-chat-message.user a {
   color: #ffffff;
 }
 
-.volunteer-opportunity-links {
+.github-chat-actions {
   margin: 0.6rem 0 0;
   padding-left: 1rem;
 }
 
-.volunteer-opportunity-links li + li {
+.github-chat-actions li + li {
   margin-top: 0.35rem;
 }
 
-.volunteer-opportunity-links a {
+.github-chat-actions a {
   color: #0b5eb8;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.volunteer-opportunity-links a:hover,
-.volunteer-opportunity-links a:focus-visible {
+.github-chat-actions a:hover,
+.github-chat-actions a:focus-visible {
   color: #08448a;
 }
 
-.volunteer-chat-form {
+.github-chat-form {
   margin-top: 0;
   padding: 0.9rem 0.95rem 1rem;
   background: var(--surface);
 }
 
-.volunteer-chat-label {
+.github-chat-label {
   display: block;
   margin-bottom: 0.45rem;
   color: var(--primary-dark);
   font-weight: 700;
 }
 
-.volunteer-chat-form input {
+.github-chat-form input {
   width: 100%;
   padding: 0.85rem 1rem;
   border: 1px solid var(--border);
@@ -869,7 +869,7 @@ footer {
   font: inherit;
 }
 
-.volunteer-chat-form input:focus {
+.github-chat-form input:focus {
   outline: 2px solid rgba(47, 107, 95, 0.18);
   border-color: var(--primary);
 }
