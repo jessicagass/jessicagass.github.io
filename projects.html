@@ -175,7 +175,7 @@
               <div class="panel volunteer-chatbot-panel">
                 <h2>Ask the GitHub Navigator chatbot</h2>
                 <p class="lead">
-                  Ask where to click on GitHub.com for common tasks. The chatbot gives concise navigation steps and links to relevant GitHub pages and docs.
+                  Ask where to click on GitHub.com for common tasks, how to create a new GitHub Pages page, or for starter code snippets (navbar, dropdown menu, and CSS setup).
                 </p>
 
                 <div class="chatbox-shell" role="region" aria-label="GitHub Navigator Chat">
@@ -188,6 +188,12 @@
                   </div>
 
                   <div id="volunteerChatLog" class="volunteer-chat-log" aria-live="polite"></div>
+                  <div class="chatbox-prompts" aria-label="Chat examples">
+                    <button type="button" class="prompt-chip" data-prompt="How do I create a new page for my GitHub Pages site?">New page on GitHub Pages</button>
+                    <button type="button" class="prompt-chip" data-prompt="Give me basic HTML and CSS for a responsive navbar.">Navbar starter code</button>
+                    <button type="button" class="prompt-chip" data-prompt="How do I make a dropdown menu in HTML, CSS, and JavaScript?">Dropdown menu code</button>
+                    <button type="button" class="prompt-chip" data-prompt="How should I organize styles.css for a website?">styles.css structure</button>
+                  </div>
 
                   <form id="volunteerChatForm" class="volunteer-chat-form">
                     <label for="volunteerChatInput" class="visually-hidden">Your message</label>
@@ -274,6 +280,7 @@ while True:
     const volunteerChatInput = document.getElementById("volunteerChatInput");
     const volunteerChatLog = document.getElementById("volunteerChatLog");
     const volunteerChatResetBtn = document.getElementById("volunteerChatReset");
+    const chatPromptButtons = document.querySelectorAll(".prompt-chip");
     const MS_PER_DAY = 1000 * 60 * 60 * 24;
     const WEEKDAY_INDEX = {
       sunday: 0,
@@ -435,8 +442,64 @@ while True:
       },
     ];
 
-    function createVolunteerReply(text, sources = [], actions = []) {
-      return { text, sources, actions };
+    const starterCodeSnippets = {
+      navbar: `<nav class="navbar">
+  <a class="brand" href="/">MySite</a>
+  <button class="menu-toggle" aria-expanded="false" aria-controls="main-menu">Menu</button>
+  <ul id="main-menu" class="menu">
+    <li><a href="/">Home</a></li>
+    <li><a href="/about.html">About</a></li>
+    <li><a href="/projects.html">Projects</a></li>
+    <li><a href="/contact.html">Contact</a></li>
+  </ul>
+</nav>`,
+      dropdown: `<div class="dropdown">
+  <button class="dropdown-toggle" aria-expanded="false">Resources</button>
+  <ul class="dropdown-menu" hidden>
+    <li><a href="/guides.html">Guides</a></li>
+    <li><a href="/tutorials.html">Tutorials</a></li>
+    <li><a href="/faq.html">FAQ</a></li>
+  </ul>
+</div>
+
+// JavaScript
+const toggle = document.querySelector(".dropdown-toggle");
+const menu = document.querySelector(".dropdown-menu");
+toggle.addEventListener("click", () => {
+  const open = toggle.getAttribute("aria-expanded") === "true";
+  toggle.setAttribute("aria-expanded", String(!open));
+  menu.hidden = open;
+});`,
+      stylesheet: `:root {
+  --bg: #f8fafc;
+  --text: #1f2937;
+  --primary: #0f766e;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.container {
+  width: min(1100px, 92%);
+  margin-inline: auto;
+}
+
+.button {
+  background: var(--primary);
+  color: white;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+}`,
+    };
+
+    function createVolunteerReply(text, sources = [], actions = [], code = "") {
+      return { text, sources, actions, code };
     }
 
     function appendVolunteerChatMessage(role, content) {
@@ -454,6 +517,15 @@ while True:
       body.textContent = payload.text;
 
       message.append(author, body);
+
+      if (role === "bot" && payload.code) {
+        const codeBlock = document.createElement("pre");
+        codeBlock.className = "volunteer-chat-code";
+        const codeContent = document.createElement("code");
+        codeContent.textContent = payload.code;
+        codeBlock.append(codeContent);
+        message.append(codeBlock);
+      }
 
       if (role === "bot" && payload.actions?.length) {
         const opportunityList = document.createElement("ul");
@@ -494,14 +566,58 @@ while True:
 
     function getVolunteerBotReply(question) {
       const input = question.toLowerCase();
+      const normalizedInput = normalizeSearchTerms(input);
       const matches = githubNavigatorKnowledge.filter((entry) =>
-        entry.keywords.some((keyword) => input.includes(keyword))
+        entry.keywords.some((keyword) => normalizedInput.includes(keyword))
       );
-      const sourceLinks = buildGitHubSources(input, matches);
+      const sourceLinks = buildGitHubSources(normalizedInput, matches);
+
+      if (isGitHubPagesQuestion(normalizedInput)) {
+        return createVolunteerReply(
+          "To add a new page on GitHub Pages: create a new .html file in your site repository, add it to your navigation links, commit the change, and wait for Pages to rebuild. You can also create pages directly in the GitHub web editor from Add file > Create new file.",
+          [
+            { label: "GitHub Pages docs", url: "https://docs.github.com/pages" },
+            { label: "Creating new files on GitHub", url: "https://docs.github.com/repositories/working-with-files/managing-files/creating-new-files" },
+          ],
+          [
+            "Open your GitHub Pages repository (often <username>.github.io).",
+            "Create a file like about.html or resources.html.",
+            "Add a matching link in your navbar.",
+            "Commit changes to the publishing branch and refresh the live site.",
+          ]
+        );
+      }
+
+      if (isNavbarQuestion(normalizedInput)) {
+        return createVolunteerReply(
+          "Here is a simple responsive navbar starter. Use the same links across your pages so navigation stays consistent.",
+          [{ label: "HTML basics", url: "https://developer.mozilla.org/docs/Learn_web_development/Core/Structuring_content/Basic_HTML_syntax" }],
+          ["Paste this into your page and adapt link paths for your site structure."],
+          starterCodeSnippets.navbar
+        );
+      }
+
+      if (isDropdownQuestion(normalizedInput)) {
+        return createVolunteerReply(
+          "This dropdown starter includes a small JavaScript toggle and accessible aria-expanded handling.",
+          [{ label: "ARIA authoring practices", url: "https://www.w3.org/WAI/ARIA/apg/" }],
+          ["Style .dropdown-menu with position:absolute if you want it to open below the button."],
+          starterCodeSnippets.dropdown
+        );
+      }
+
+      if (isStylesheetQuestion(normalizedInput)) {
+        return createVolunteerReply(
+          "This styles.css starter gives you a clean foundation with color variables, body defaults, and reusable utility classes.",
+          [{ label: "CSS reference", url: "https://developer.mozilla.org/docs/Web/CSS/Reference" }],
+          ["Keep variables at the top and group rules by layout, components, and utilities."],
+          starterCodeSnippets.stylesheet
+        );
+      }
 
       if (!matches.length) {
         return createVolunteerReply(
-          "I can help you navigate GitHub.com. Tell me your goal (for example: open issues, create a PR, find Actions logs, edit profile, or manage repository settings).",
+          "I can help with GitHub navigation and basic website setup. Ask me how to create a new GitHub Pages page or request starter code for a navbar, dropdown menu, or styles.css file.",
           [githubDocsHome, ...sourceLinks],
           [
             "Open github.com and sign in.",
@@ -571,10 +687,38 @@ while True:
     function normalizeSearchTerms(rawQuestion) {
       const cleaned = (rawQuestion || "")
         .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/[^a-z0-9\s./_-]/g, " ")
         .replace(/\s+/g, " ")
         .trim();
       return cleaned || "github navigation";
+    }
+
+    function includesAny(input, options) {
+      return options.some((option) => input.includes(option));
+    }
+
+    function isGitHubPagesQuestion(input) {
+      return includesAny(input, [
+        "github pages",
+        "gh pages",
+        "new page",
+        "create page",
+        "add page",
+        "new html page",
+        "make a page",
+      ]) && includesAny(input, ["github", "site", "pages", ".github.io", "website"]);
+    }
+
+    function isNavbarQuestion(input) {
+      return includesAny(input, ["navbar", "navigation bar", "nav bar", "site menu"]);
+    }
+
+    function isDropdownQuestion(input) {
+      return includesAny(input, ["dropdown", "drop down", "menu toggle", "submenu"]);
+    }
+
+    function isStylesheetQuestion(input) {
+      return includesAny(input, ["styles.css", "css file", "stylesheet", "site styles", "css starter"]);
     }
 
     function extractRepoHint(input) {
@@ -605,6 +749,17 @@ while True:
     volunteerChatResetBtn.addEventListener("click", () => {
       resetVolunteerChat();
       volunteerChatInput.focus();
+    });
+
+    chatPromptButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const prompt = button.dataset.prompt || "";
+        if (!prompt) {
+          return;
+        }
+        volunteerChatInput.value = prompt;
+        volunteerChatInput.focus();
+      });
     });
 
     function parseWeekdays(value) {
