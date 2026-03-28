@@ -160,7 +160,7 @@
             </div>
           </details>
 
-          <details class="card project-card volunteer-chatbot-card">
+          <details class="card project-card github-chatbot-card">
             <summary class="project-card-summary">
               <div>
                 <h3>GitHub Website Navigator Chatbot</h3>
@@ -171,8 +171,8 @@
               <span class="project-card-toggle" aria-hidden="true">Expand project</span>
             </summary>
 
-            <div class="project-card-body volunteer-chatbot-body">
-              <div class="panel volunteer-chatbot-panel">
+            <div class="project-card-body github-chatbot-body">
+              <div class="panel github-chatbot-panel">
                 <h2>Ask the GitHub Navigator chatbot</h2>
                 <p class="lead">
                   Ask where to click on GitHub.com for common tasks, how to create a new GitHub Pages page, or for starter code snippets (navbar, dropdown menu, and CSS setup).
@@ -187,7 +187,7 @@
                     </div>
                   </div>
 
-                  <div id="githubChatLog" class="volunteer-chat-log" aria-live="polite"></div>
+                  <div id="githubChatLog" class="github-chat-log" aria-live="polite"></div>
                   <div class="chatbox-prompts" aria-label="Chat examples">
                     <button type="button" class="prompt-chip" data-prompt="How do I create a new page for my GitHub Pages site?">New page on GitHub Pages</button>
                     <button type="button" class="prompt-chip" data-prompt="Give me basic HTML and CSS for a responsive navbar.">Navbar starter code</button>
@@ -195,7 +195,7 @@
                     <button type="button" class="prompt-chip" data-prompt="How should I organize styles.css for a website?">styles.css structure</button>
                   </div>
 
-                  <form id="githubChatForm" class="volunteer-chat-form">
+                  <form id="githubChatForm" class="github-chat-form">
                     <label for="githubChatInput" class="visually-hidden">Your message</label>
                     <input
                       id="githubChatInput"
@@ -620,15 +620,15 @@ body {
 
     function appendGitHubChatMessage(role, content) {
       const message = document.createElement("div");
-      message.className = `volunteer-chat-message ${role}`;
+      message.className = `github-chat-message ${role}`;
       const roleLabel = role === "bot" ? "GitHub Navigator" : "You";
 
       const author = document.createElement("span");
-      author.className = "volunteer-chat-author";
+      author.className = "github-chat-author";
       author.textContent = roleLabel;
 
       const body = document.createElement("p");
-      body.className = "volunteer-chat-text";
+      body.className = "github-chat-text";
       const payload = typeof content === "string" ? createGitHubReply(content) : content;
       body.textContent = payload.text;
 
@@ -636,7 +636,7 @@ body {
 
       if (role === "bot" && payload.code) {
         const codeBlock = document.createElement("pre");
-        codeBlock.className = "volunteer-chat-code";
+        codeBlock.className = "github-chat-code";
         const codeContent = document.createElement("code");
         codeContent.textContent = payload.code;
         codeBlock.append(codeContent);
@@ -645,7 +645,7 @@ body {
 
       if (role === "bot" && payload.actions?.length) {
         const opportunityList = document.createElement("ul");
-        opportunityList.className = "volunteer-opportunity-links";
+        opportunityList.className = "github-chat-actions";
 
         payload.actions.forEach((action, index) => {
           const item = document.createElement("li");
@@ -658,7 +658,7 @@ body {
 
       if (role === "bot" && payload.sources?.length) {
         const sourceWrapper = document.createElement("p");
-        sourceWrapper.className = "volunteer-chat-text";
+        sourceWrapper.className = "github-chat-text";
         sourceWrapper.append("Source: ");
 
         payload.sources.forEach((source, index) => {
