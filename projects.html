@@ -163,9 +163,9 @@
           <details class="card project-card volunteer-chatbot-card">
             <summary class="project-card-summary">
               <div>
-                <h3>GitHub Website Navigator Chatbot</h3>
+                <h3>Personal Website Navigator Chatbot</h3>
                 <p>
-                  A JavaScript chatbot that helps users navigate GitHub’s web interface, find the right pages quickly, and understand common workflows like repositories, issues, pull requests, and settings.
+                  A JavaScript chatbot that helps visitors navigate jessicagass.github.io, find sections quickly, and locate research, projects, and contact details.
                 </p>
               </div>
               <span class="project-card-toggle" aria-hidden="true">Expand project</span>
@@ -173,16 +173,16 @@
 
             <div class="project-card-body volunteer-chatbot-body">
               <div class="panel volunteer-chatbot-panel">
-                <h2>Ask the GitHub Navigator chatbot</h2>
+                <h2>Ask the Website Navigator chatbot</h2>
                 <p class="lead">
-                  Ask where to click on GitHub.com for common tasks. The chatbot gives concise navigation steps and links to relevant GitHub pages and docs.
+                  Ask where to click on this site. The chatbot gives concise navigation steps and links to relevant pages and sections.
                 </p>
 
-                <div class="chatbox-shell" role="region" aria-label="GitHub Navigator Chat">
+                <div class="chatbox-shell" role="region" aria-label="Website Navigator Chat">
                   <div class="chatbox-header">
                     <span class="chatbox-indicator" aria-hidden="true"></span>
                     <div>
-                      <p class="chatbox-title">GitHub Navigator</p>
+                      <p class="chatbox-title">Website Navigator</p>
                       <p class="chatbox-subtitle">Online now</p>
                     </div>
                   </div>
@@ -365,72 +365,53 @@ while True:
     });
 
     const volunteerChatOpeners = [
-      "Hey! I’m GitHub Navigator 👋 Ask me where to click on GitHub.com and I’ll map out the fastest path.",
-      "Try prompts like: 'How do I open pull requests?', 'Where are repository settings?', or 'How can I find Actions logs?'.",
+      "Hey! I’m your website navigation helper 👋 Ask me how to find things on jessicagass.github.io.",
+      "Try prompts like: 'Where is your contact info?', 'How do I get to Research?', or 'Where is the scheduler tool?'.",
     ];
 
-    const githubDocsHome = { label: "GitHub Docs", url: "https://docs.github.com" };
-    const githubNavigatorKnowledge = [
+    const websiteHome = { label: "Home", url: "index.html" };
+    const websiteNavigationKnowledge = [
       {
-        keywords: ["repository", "repo", "code tab", "default branch"],
-        answer: "Open a repository, then use the top tabs: Code, Issues, Pull requests, Actions, Projects, Security, and Insights.",
+        keywords: ["home", "landing", "main page", "about"],
+        answer: "Use Home in the top navigation to return to the main page with your intro, focus areas, and About Me section.",
         paths: [
-          { label: "Your repositories", url: "https://github.com/repositories" },
-          { label: "Managing a repository", url: "https://docs.github.com/repositories" },
+          { label: "Home page", url: "index.html" },
         ],
       },
       {
-        keywords: ["issue", "issues", "bug", "ticket"],
-        answer: "Go to the repository > Issues tab > New issue. You can apply labels, assignees, milestones, and templates from the sidebar.",
+        keywords: ["research", "publication", "conference", "under review", "paper"],
+        answer: "Open the Research page from the top nav to find research areas, publications, conference presentations, and work under review.",
         paths: [
-          { label: "Issues quickstart", url: "https://docs.github.com/issues/tracking-your-work-with-issues/quickstart" },
-          { label: "GitHub Issues", url: "https://github.com/issues" },
+          { label: "Research page", url: "research.html" },
         ],
       },
       {
-        keywords: ["pull request", "pr", "merge"],
-        answer: "Open your repo > Pull requests > New pull request, choose base/compare branches, then create and review checks before merging.",
+        keywords: ["project", "projects", "tool", "scheduler", "chatbot", "download code"],
+        answer: "Open the Projects page to access project cards, including the Outlook scheduler download, the interactive project scheduler, and this navigation chatbot.",
         paths: [
-          { label: "Creating a pull request", url: "https://docs.github.com/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request" },
-          { label: "Pull requests dashboard", url: "https://github.com/pulls" },
+          { label: "Projects page", url: "projects.html" },
         ],
       },
       {
-        keywords: ["actions", "workflow", "ci", "logs", "run"],
-        answer: "Use the Actions tab inside a repository to view workflow runs, open a run, and inspect each job’s logs and artifacts.",
+        keywords: ["contact", "email", "linkedin", "get in touch", "reach"],
+        answer: "From Home, use Contact in the top nav (or Get in Touch) to jump to the contact section with email, location, and LinkedIn.",
         paths: [
-          { label: "GitHub Actions docs", url: "https://docs.github.com/actions" },
-          { label: "Actions dashboard", url: "https://github.com/actions" },
+          { label: "Contact section", url: "index.html#contact" },
+          { label: "LinkedIn profile", url: "https://www.linkedin.com/in/jessica-gass-5a269016b/" },
         ],
       },
       {
-        keywords: ["branch", "branches", "create branch", "switch branch"],
-        answer: "In the repo Code tab, click the branch selector near the file list, then create or switch branches from the dropdown.",
+        keywords: ["clear", "reset chat", "start over", "new question"],
+        answer: "Use the Clear button below the chat input to reset this conversation and restore the starter prompts.",
         paths: [
-          { label: "About branches", url: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/about-branches" },
+          { label: "Projects page (chatbot)", url: "projects.html" },
         ],
       },
       {
-        keywords: ["settings", "permissions", "collaborator", "access", "teams"],
-        answer: "Go to the repository > Settings. For access control, open Collaborators & teams (or Manage access depending on repo type).",
+        keywords: ["save schedule", "download schedule", "reset scheduler", "availability", "rest days", "meeting days"],
+        answer: "On the Interactive Project Scheduler card, enter availability settings, add projects, then use Save Schedule, Download Schedule, or Reset Scheduler buttons.",
         paths: [
-          { label: "Repository settings", url: "https://docs.github.com/repositories/managing-your-repositorys-settings-and-features" },
-        ],
-      },
-      {
-        keywords: ["profile", "account", "avatar", "bio"],
-        answer: "Click your profile photo (top-right) to open account menus. Visit Your profile to edit your bio, pinned repos, and activity overview.",
-        paths: [
-          { label: "Your profile", url: "https://github.com/settings/profile" },
-          { label: "Personal settings", url: "https://github.com/settings" },
-        ],
-      },
-      {
-        keywords: ["notification", "notifications", "watch", "inbox"],
-        answer: "Use the Notifications inbox to track mentions, reviews, and subscribed updates. Filter by reason to reduce noise.",
-        paths: [
-          { label: "Notifications inbox", url: "https://github.com/notifications" },
-          { label: "Notifications docs", url: "https://docs.github.com/account-and-profile/managing-subscriptions-and-notifications-on-github" },
+          { label: "Projects page (scheduler)", url: "projects.html" },
         ],
       },
     ];
@@ -442,7 +423,7 @@ while True:
     function appendVolunteerChatMessage(role, content) {
       const message = document.createElement("div");
       message.className = `volunteer-chat-message ${role}`;
-      const roleLabel = role === "bot" ? "GitHub Navigator" : "You";
+      const roleLabel = role === "bot" ? "Website Navigator" : "You";
 
       const author = document.createElement("span");
       author.className = "volunteer-chat-author";
@@ -494,19 +475,19 @@ while True:
 
     function getVolunteerBotReply(question) {
       const input = question.toLowerCase();
-      const matches = githubNavigatorKnowledge.filter((entry) =>
+      const matches = websiteNavigationKnowledge.filter((entry) =>
         entry.keywords.some((keyword) => input.includes(keyword))
       );
-      const sourceLinks = buildGitHubSources(input, matches);
+      const sourceLinks = buildWebsiteSources(input, matches);
 
       if (!matches.length) {
         return createVolunteerReply(
-          "I can help you navigate GitHub.com. Tell me your goal (for example: open issues, create a PR, find Actions logs, edit profile, or manage repository settings).",
-          [githubDocsHome, ...sourceLinks],
+          "I can help you navigate jessicagass.github.io. Tell me what you want to find (for example: Research, Projects tools, or Contact info).",
+          [websiteHome, ...sourceLinks],
           [
-            "Open github.com and sign in.",
-            "Use the top search bar to locate the repository or user.",
-            "Use repository tabs (Code, Issues, Pull requests, Actions, Settings) to complete your task.",
+            "Use the top navigation links (Home, Research, Projects, Contact).",
+            "If you need email or LinkedIn, open Contact from the Home page.",
+            "If you need tools, open Projects and expand the project cards.",
           ]
         );
       }
@@ -514,47 +495,41 @@ while True:
       return createVolunteerReply(
         matches.map((entry) => entry.answer).join(" "),
         sourceLinks,
-        buildGitHubActionSteps(input, matches[0])
+        buildWebsiteActionSteps(matches[0])
       );
     }
 
-    function buildGitHubActionSteps(input, match) {
-      const repoHint = extractRepoHint(input);
-      const repoStep = repoHint
-        ? `Open repository: ${repoHint}.`
-        : "Open the target repository from search or your profile.";
-
+    function buildWebsiteActionSteps(match) {
       const baseSteps = [
-        "Sign in at github.com.",
-        repoStep,
+        "Open jessicagass.github.io.",
+        "Use the top navigation bar to jump to the right page.",
       ];
 
       if (!match) {
-        return [...baseSteps, "Use the tab that matches your task (Issues, Pull requests, Actions, or Settings)."];
+        return [...baseSteps, "Open Home, Research, or Projects based on what you need."];
       }
 
-      if (match.keywords.includes("issue")) {
-        return [...baseSteps, "Open the Issues tab.", "Click New issue and complete the template."];
+      if (match.keywords.includes("contact")) {
+        return [...baseSteps, "Open Home.", "Click Contact in the navigation (or Get in Touch) to jump to contact details."];
       }
-      if (match.keywords.includes("pull request")) {
-        return [...baseSteps, "Open Pull requests.", "Click New pull request and choose base/compare branches."];
+      if (match.keywords.includes("research")) {
+        return [...baseSteps, "Click Research in the navigation.", "Scroll to find publications, presentations, or under-review work."];
       }
-      if (match.keywords.includes("actions")) {
-        return [...baseSteps, "Open Actions.", "Select a workflow run to inspect job logs."];
+      if (match.keywords.includes("project")) {
+        return [...baseSteps, "Click Projects in the navigation.", "Expand the relevant project card to view details and actions."];
       }
-      if (match.keywords.includes("settings")) {
-        return [...baseSteps, "Open Settings.", "Choose the specific settings section from the left sidebar."];
+      if (match.keywords.includes("clear")) {
+        return [...baseSteps, "Go to Projects.", "Use the Clear button in the chatbot card to reset messages."];
       }
-      return [...baseSteps, "Use the appropriate repository tab to continue the workflow."];
+      return [...baseSteps, "Open the related section and follow the on-page buttons or links."];
     }
 
-    function buildGitHubSources(input, matches) {
+    function buildWebsiteSources(input, matches) {
       const searchText = normalizeSearchTerms(input);
-      const repoHint = extractRepoHint(input);
-      const encodedSearch = encodeURIComponent(repoHint || searchText);
       const links = [
-        githubDocsHome,
-        { label: "GitHub Search", url: `https://github.com/search?q=${encodedSearch}&type=repositories` },
+        websiteHome,
+        { label: "Research", url: "research.html" },
+        { label: "Projects", url: "projects.html" },
       ];
 
       matches.forEach((match) => {
@@ -574,13 +549,7 @@ while True:
         .replace(/[^a-z0-9\s]/g, " ")
         .replace(/\s+/g, " ")
         .trim();
-      return cleaned || "github navigation";
-    }
-
-    function extractRepoHint(input) {
-      const locationPattern = /\b(?:repo|repository)\s+([a-z0-9._-]+\/[a-z0-9._-]+)\b/i;
-      const match = input.match(locationPattern);
-      return match ? match[1].trim().replace(/\s+/g, " ") : "";
+      return cleaned || "website navigation";
     }
 
     function resetVolunteerChat() {
