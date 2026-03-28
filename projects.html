@@ -377,6 +377,65 @@ while True:
     ];
 
     const githubDocsHome = { label: "GitHub Docs", url: "https://docs.github.com" };
+    const githubDefinitionKnowledge = [
+      {
+        terms: ["pull request", "pr"],
+        answer: "A pull request is a proposal to merge changes from one branch into another. It shows code differences, lets collaborators review and discuss the changes, runs checks, and provides merge options when the update is ready.",
+        sources: [
+          { label: "About pull requests", url: "https://docs.github.com/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests" },
+        ],
+      },
+      {
+        terms: ["action log", "actions log", "workflow log", "run log", "job log"],
+        answer: "An Actions log is the detailed output from a workflow run or job in GitHub Actions. It records each step, command output, and failures so you can debug automation and confirm what happened during CI/CD.",
+        sources: [
+          { label: "Viewing workflow run history", url: "https://docs.github.com/actions/monitoring-and-troubleshooting-workflows/viewing-workflow-run-history" },
+        ],
+      },
+      {
+        terms: ["repository", "repo"],
+        answer: "A repository is a project container on GitHub that stores files, commit history, branches, pull requests, issues, and settings. It is the central place where code and collaboration workflows live.",
+        sources: [
+          { label: "About repositories", url: "https://docs.github.com/repositories/creating-and-managing-repositories/about-repositories" },
+        ],
+      },
+      {
+        terms: ["branch"],
+        answer: "A branch is an independent line of development in a repository. It allows you to work on changes safely without affecting the default branch until you are ready to merge.",
+        sources: [
+          { label: "About branches", url: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/about-branches" },
+        ],
+      },
+      {
+        terms: ["commit"],
+        answer: "A commit is a saved snapshot of changes in a repository, including a message describing what changed. Commits build your project history and can be reviewed, compared, and reverted.",
+        sources: [
+          { label: "About commits", url: "https://docs.github.com/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/about-commits" },
+        ],
+      },
+      {
+        terms: ["fork"],
+        answer: "A fork is a personal copy of someone else’s repository. It lets you experiment and contribute changes back through pull requests without direct write access to the original project.",
+        sources: [
+          { label: "Fork a repo", url: "https://docs.github.com/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo" },
+        ],
+      },
+      {
+        terms: ["issue"],
+        answer: "An issue is a tracked discussion item for bugs, tasks, feature ideas, or questions in a repository. Teams use issues to plan, assign work, and track progress.",
+        sources: [
+          { label: "Quickstart for GitHub Issues", url: "https://docs.github.com/issues/tracking-your-work-with-issues/quickstart" },
+        ],
+      },
+      {
+        terms: ["github action", "workflow"],
+        answer: "A GitHub Actions workflow is an automated process defined in YAML files inside .github/workflows. Workflows can run tests, builds, deployments, and other tasks based on events.",
+        sources: [
+          { label: "Understanding GitHub Actions", url: "https://docs.github.com/actions/learn-github-actions/understanding-github-actions" },
+        ],
+      },
+    ];
+
     const githubNavigatorKnowledge = [
       {
         keywords: ["repository", "repo", "code tab", "default branch"],
@@ -567,10 +626,22 @@ body {
     function getVolunteerBotReply(question) {
       const input = question.toLowerCase();
       const normalizedInput = normalizeSearchTerms(input);
+      const definitionMatch = findDefinitionMatch(normalizedInput);
       const matches = githubNavigatorKnowledge.filter((entry) =>
         entry.keywords.some((keyword) => normalizedInput.includes(keyword))
       );
       const sourceLinks = buildGitHubSources(normalizedInput, matches);
+
+      if (definitionMatch && isDefinitionQuestion(normalizedInput)) {
+        return createVolunteerReply(
+          definitionMatch.answer,
+          [githubDocsHome, ...(definitionMatch.sources || [])],
+          [
+            `Want a practical walkthrough? Ask: "How do I use ${definitionMatch.terms[0]} on GitHub?"`,
+            "You can also ask for related terms, like commit, fork, issue, workflow, and merge.",
+          ]
+        );
+      }
 
       if (isGitHubPagesQuestion(normalizedInput)) {
         return createVolunteerReply(
@@ -616,6 +687,16 @@ body {
       }
 
       if (!matches.length) {
+        if (definitionMatch) {
+          return createVolunteerReply(
+            definitionMatch.answer,
+            [githubDocsHome, ...(definitionMatch.sources || [])],
+            [
+              `If helpful, I can also show where to click in GitHub to use ${definitionMatch.terms[0]}.`,
+            ]
+          );
+        }
+
         return createVolunteerReply(
           "I can help with GitHub navigation and basic website setup. Ask me how to create a new GitHub Pages page or request starter code for a navbar, dropdown menu, or styles.css file.",
           [githubDocsHome, ...sourceLinks],
@@ -707,6 +788,23 @@ body {
         "new html page",
         "make a page",
       ]) && includesAny(input, ["github", "site", "pages", ".github.io", "website"]);
+    }
+
+    function isDefinitionQuestion(input) {
+      return includesAny(input, [
+        "what is",
+        "what's",
+        "define",
+        "definition",
+        "meaning of",
+        "explain",
+      ]);
+    }
+
+    function findDefinitionMatch(input) {
+      return githubDefinitionKnowledge.find((entry) =>
+        entry.terms.some((term) => input.includes(term))
+      );
     }
 
     function isNavbarQuestion(input) {
