@@ -163,9 +163,9 @@
           <details class="card project-card volunteer-chatbot-card">
             <summary class="project-card-summary">
               <div>
-                <h3>Volunteer Opportunity Guide Chatbot</h3>
+                <h3>GitHub Website Navigator Chatbot</h3>
                 <p>
-                  A JavaScript chatbot prototype that helps people discover local or remote volunteer opportunities using Idealist search best practices (location, radius, cause areas, skills, and alerts).
+                  A JavaScript chatbot that helps users navigate GitHub’s web interface, find the right pages quickly, and understand common workflows like repositories, issues, pull requests, and settings.
                 </p>
               </div>
               <span class="project-card-toggle" aria-hidden="true">Expand project</span>
@@ -173,16 +173,16 @@
 
             <div class="project-card-body volunteer-chatbot-body">
               <div class="panel volunteer-chatbot-panel">
-                <h2>Ask the Volunteer Finder chatbot</h2>
+                <h2>Ask the GitHub Navigator chatbot</h2>
                 <p class="lead">
-                  Ask about volunteer opportunities (local, remote, or hybrid). The chatbot focuses on matching guidance inspired by Idealist Volunteer Match and other public web sources.
+                  Ask where to click on GitHub.com for common tasks. The chatbot gives concise navigation steps and links to relevant GitHub pages and docs.
                 </p>
 
-                <div class="chatbox-shell" role="region" aria-label="Volunteer Finder Chat">
+                <div class="chatbox-shell" role="region" aria-label="GitHub Navigator Chat">
                   <div class="chatbox-header">
                     <span class="chatbox-indicator" aria-hidden="true"></span>
                     <div>
-                      <p class="chatbox-title">Volunteer Finder</p>
+                      <p class="chatbox-title">GitHub Navigator</p>
                       <p class="chatbox-subtitle">Online now</p>
                     </div>
                   </div>
@@ -365,94 +365,84 @@ while True:
     });
 
     const volunteerChatOpeners = [
-      "Hey! I’m Volunteer Finder 👋 I prioritize Idealist and VolunteerMatch search links and include your requested direct Idealist opportunity link.",
-      "Share your location, cause area, and availability (for example: 'remote tutoring in Chicago on weekends') and I’ll generate focused web-search links.",
+      "Hey! I’m GitHub Navigator 👋 Ask me where to click on GitHub.com and I’ll map out the fastest path.",
+      "Try prompts like: 'How do I open pull requests?', 'Where are repository settings?', or 'How can I find Actions logs?'.",
     ];
 
-    const IDEALIST_SOURCES = [
+    const githubDocsHome = { label: "GitHub Docs", url: "https://docs.github.com" };
+    const githubNavigatorKnowledge = [
       {
-        label: "Idealist Volunteer Opportunities",
-        url: "https://www.idealist.org/en/volunteer-opportunities",
+        keywords: ["repository", "repo", "code tab", "default branch"],
+        answer: "Open a repository, then use the top tabs: Code, Issues, Pull requests, Actions, Projects, Security, and Insights.",
+        paths: [
+          { label: "Your repositories", url: "https://github.com/repositories" },
+          { label: "Managing a repository", url: "https://docs.github.com/repositories" },
+        ],
       },
       {
-        label: "Idealist (main site)",
-        url: "https://www.idealist.org/en",
+        keywords: ["issue", "issues", "bug", "ticket"],
+        answer: "Go to the repository > Issues tab > New issue. You can apply labels, assignees, milestones, and templates from the sidebar.",
+        paths: [
+          { label: "Issues quickstart", url: "https://docs.github.com/issues/tracking-your-work-with-issues/quickstart" },
+          { label: "GitHub Issues", url: "https://github.com/issues" },
+        ],
       },
       {
-        label: "VolunteerMatch Opportunities",
-        url: "https://www.volunteermatch.org/search",
+        keywords: ["pull request", "pr", "merge"],
+        answer: "Open your repo > Pull requests > New pull request, choose base/compare branches, then create and review checks before merging.",
+        paths: [
+          { label: "Creating a pull request", url: "https://docs.github.com/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request" },
+          { label: "Pull requests dashboard", url: "https://github.com/pulls" },
+        ],
+      },
+      {
+        keywords: ["actions", "workflow", "ci", "logs", "run"],
+        answer: "Use the Actions tab inside a repository to view workflow runs, open a run, and inspect each job’s logs and artifacts.",
+        paths: [
+          { label: "GitHub Actions docs", url: "https://docs.github.com/actions" },
+          { label: "Actions dashboard", url: "https://github.com/actions" },
+        ],
+      },
+      {
+        keywords: ["branch", "branches", "create branch", "switch branch"],
+        answer: "In the repo Code tab, click the branch selector near the file list, then create or switch branches from the dropdown.",
+        paths: [
+          { label: "About branches", url: "https://docs.github.com/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/about-branches" },
+        ],
+      },
+      {
+        keywords: ["settings", "permissions", "collaborator", "access", "teams"],
+        answer: "Go to the repository > Settings. For access control, open Collaborators & teams (or Manage access depending on repo type).",
+        paths: [
+          { label: "Repository settings", url: "https://docs.github.com/repositories/managing-your-repositorys-settings-and-features" },
+        ],
+      },
+      {
+        keywords: ["profile", "account", "avatar", "bio"],
+        answer: "Click your profile photo (top-right) to open account menus. Visit Your profile to edit your bio, pinned repos, and activity overview.",
+        paths: [
+          { label: "Your profile", url: "https://github.com/settings/profile" },
+          { label: "Personal settings", url: "https://github.com/settings" },
+        ],
+      },
+      {
+        keywords: ["notification", "notifications", "watch", "inbox"],
+        answer: "Use the Notifications inbox to track mentions, reviews, and subscribed updates. Filter by reason to reduce noise.",
+        paths: [
+          { label: "Notifications inbox", url: "https://github.com/notifications" },
+          { label: "Notifications docs", url: "https://docs.github.com/account-and-profile/managing-subscriptions-and-notifications-on-github" },
+        ],
       },
     ];
 
-    const volunteerChatKnowledge = [
-      {
-        keywords: ["remote", "virtual", "online"],
-        answer: "Remote opportunities you can target right now include virtual mentoring/tutoring, helpline support, grant writing, and nonprofit communications roles.",
-        sources: [],
-      },
-      {
-        keywords: ["near", "local", "nearby", "city", "zip", "location", "radius"],
-        answer: "Local opportunities often include food-access distribution, youth mentoring, community events, and refugee support with in-person options.",
-        sources: [],
-      },
-      {
-        keywords: ["cause", "passion", "interest", "environment", "education", "animals", "health"],
-        answer: "Use the Cause Areas filter to focus on topics you care about. You can select one or multiple cause areas.",
-        sources: [],
-      },
-      {
-        keywords: ["skill", "experience", "coding", "design", "writing", "language"],
-        answer: "Use the Skills filter to match opportunities to what you can offer (or skills you want to build).",
-        sources: [],
-      },
-      {
-        keywords: ["date", "weekend", "time", "schedule", "newest", "recent", "recency"],
-        answer: "You can filter by date/time preferences (like weekends) and sort by recency to surface newer opportunities first.",
-        sources: [],
-      },
-      {
-        keywords: ["alert", "email", "save", "saved", "notify", "notification"],
-        answer: "The page recommends saving searches and enabling alerts so new matching volunteer opportunities are surfaced automatically.",
-        sources: [],
-      },
-      {
-        keywords: ["apply", "application", "how to apply"],
-        answer: "Each volunteer listing has application instructions; follow the steps shown in that listing to submit successfully.",
-        sources: [],
-      },
-      {
-        keywords: ["idealist", "volunteer match", "internet", "web"],
-        answer: "I’m designed to give volunteer-search guidance using Idealist Volunteer Match-style filters and broader public web search strategy.",
-        sources: [],
-      },
-    ];
-
-    function isProjectPageQuestion(input) {
-      const projectTerms = [
-        "project page",
-        "featured projects",
-        "outlook",
-        "email scheduler",
-        "pywin32",
-        "task scheduler",
-        "interactive project scheduler",
-        "save schedule",
-        "download schedule",
-        "reset scheduler",
-        "this page",
-      ];
-
-      return projectTerms.some((term) => input.includes(term));
-    }
-
-    function createVolunteerReply(text, sources = [], opportunities = []) {
-      return { text, sources, opportunities };
+    function createVolunteerReply(text, sources = [], actions = []) {
+      return { text, sources, actions };
     }
 
     function appendVolunteerChatMessage(role, content) {
       const message = document.createElement("div");
       message.className = `volunteer-chat-message ${role}`;
-      const roleLabel = role === "bot" ? "Volunteer Finder" : "You";
+      const roleLabel = role === "bot" ? "GitHub Navigator" : "You";
 
       const author = document.createElement("span");
       author.className = "volunteer-chat-author";
@@ -465,18 +455,13 @@ while True:
 
       message.append(author, body);
 
-      if (role === "bot" && payload.opportunities?.length) {
+      if (role === "bot" && payload.actions?.length) {
         const opportunityList = document.createElement("ul");
         opportunityList.className = "volunteer-opportunity-links";
 
-        payload.opportunities.forEach((opportunity, index) => {
+        payload.actions.forEach((action, index) => {
           const item = document.createElement("li");
-          const link = document.createElement("a");
-          link.href = buildIdealistOpportunityUrl(opportunity);
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          link.textContent = `${index + 1}) ${opportunity.title} — ${opportunity.organization}`;
-          item.appendChild(link);
+          item.textContent = `${index + 1}) ${action}`;
           opportunityList.appendChild(item);
         });
 
@@ -509,118 +494,78 @@ while True:
 
     function getVolunteerBotReply(question) {
       const input = question.toLowerCase();
-      if (isProjectPageQuestion(input)) {
-        return createVolunteerReply("I’m focused on volunteer opportunities, not questions about the Projects page tools. Ask me about location, remote/hybrid preferences, cause areas, skills, and availability to find good volunteer matches.");
-      }
-
-      const dynamicOpportunityReply = getIdealistStyleOpportunityReply(input);
-
-      if (dynamicOpportunityReply) {
-        return dynamicOpportunityReply;
-      }
-
-      const matches = volunteerChatKnowledge.filter((entry) =>
+      const matches = githubNavigatorKnowledge.filter((entry) =>
         entry.keywords.some((keyword) => input.includes(keyword))
       );
-      const sourceLinks = buildVolunteerSearchSources(question);
+      const sourceLinks = buildGitHubSources(input, matches);
 
       if (!matches.length) {
-        const suggestedOpportunity = buildPromptDrivenOpportunity(input);
         return createVolunteerReply(
-          "Great question — I can help best when you share location, remote/hybrid/on-site preference, cause area, and weekly availability.",
-          sourceLinks,
-          [suggestedOpportunity]
+          "I can help you navigate GitHub.com. Tell me your goal (for example: open issues, create a PR, find Actions logs, edit profile, or manage repository settings).",
+          [githubDocsHome, ...sourceLinks],
+          [
+            "Open github.com and sign in.",
+            "Use the top search bar to locate the repository or user.",
+            "Use repository tabs (Code, Issues, Pull requests, Actions, Settings) to complete your task.",
+          ]
         );
       }
 
-      const suggestedOpportunity = buildPromptDrivenOpportunity(input);
       return createVolunteerReply(
-        `${matches.map((entry) => entry.answer).join(" ")} I included current search links below with Idealist and VolunteerMatch priority.`,
+        matches.map((entry) => entry.answer).join(" "),
         sourceLinks,
-        [suggestedOpportunity]
+        buildGitHubActionSteps(input, matches[0])
       );
     }
 
-    function getIdealistStyleOpportunityReply(input) {
-      const opportunityIntentKeywords = ["opportunit", "volunteer", "role", "opening", "position", "find"];
-      const hasOpportunityIntent = opportunityIntentKeywords.some((keyword) => input.includes(keyword));
+    function buildGitHubActionSteps(input, match) {
+      const repoHint = extractRepoHint(input);
+      const repoStep = repoHint
+        ? `Open repository: ${repoHint}.`
+        : "Open the target repository from search or your profile.";
 
-      if (!hasOpportunityIntent) {
-        return "";
-      }
-
-      const modality = detectModality(input) || "any";
-      const location = detectLocation(input) || "your area";
-      const cause = detectCause(input) || "your preferred cause area";
-      const sourceLinks = buildVolunteerSearchSources(input);
-      const locationLabel = location ? ` near ${location}` : "";
-      const intro = `Absolutely — I prioritized Idealist VolunteerMatch-style searching for ${modality} opportunities${locationLabel}.`;
-      const suggestedOpportunity = buildPromptDrivenOpportunity(input);
-
-      return createVolunteerReply(
-        `${intro} I also used "${cause}" in the query and included a prompt-matched Idealist opportunity search link plus live search links below.`,
-        sourceLinks,
-        [suggestedOpportunity]
-      );
-    }
-
-    function buildIdealistOpportunityUrl(opportunity) {
-      if (opportunity.idealistUrl) {
-        return opportunity.idealistUrl;
-      }
-      const query = opportunity.searchKeywords || `${opportunity.title} volunteer`;
-      const url = new URL("https://www.idealist.org/en/volunteer-opportunities");
-      url.searchParams.set("keywords", query);
-      if (opportunity.location && opportunity.location !== "anywhere") {
-        url.searchParams.set("location", opportunity.location);
-      }
-      return url.toString();
-    }
-
-    function buildPromptDrivenOpportunity(input) {
-      const modality = detectModality(input) || "any";
-      const location = detectLocation(input) || "anywhere";
-      const cause = detectCause(input) || "community support";
-      const availability = detectAvailability(input);
-
-      const keywordParts = [cause, "volunteer"];
-      if (modality !== "any") keywordParts.push(modality);
-      if (availability) keywordParts.push(availability);
-      if (location && location !== "anywhere") keywordParts.push(location);
-
-      const modalityLabel = modality === "any" ? "Flexible" : capitalizeWord(modality);
-      const title = `${modalityLabel} ${capitalizePhrase(cause)} Volunteer Opportunity`;
-      const organization = location === "anywhere"
-        ? "Idealist Nonprofit Partners"
-        : `${capitalizePhrase(location)} Community Organizations`;
-
-      return {
-        title,
-        organization,
-        location,
-        searchKeywords: keywordParts.join(" "),
-      };
-    }
-
-    function buildVolunteerSearchSources(question) {
-      const searchText = normalizeSearchTerms(question);
-      const idealistUrl = new URL("https://www.idealist.org/en/volunteer-opportunities");
-      idealistUrl.searchParams.set("keywords", searchText);
-
-      const volunteerMatchUrl = new URL("https://www.volunteermatch.org/search");
-      volunteerMatchUrl.searchParams.set("l", "United States");
-      volunteerMatchUrl.searchParams.set("k", searchText);
-
-      return [
-        {
-          label: "Idealist (priority search)",
-          url: idealistUrl.toString(),
-        },
-        {
-          label: "VolunteerMatch search",
-          url: volunteerMatchUrl.toString(),
-        },
+      const baseSteps = [
+        "Sign in at github.com.",
+        repoStep,
       ];
+
+      if (!match) {
+        return [...baseSteps, "Use the tab that matches your task (Issues, Pull requests, Actions, or Settings)."];
+      }
+
+      if (match.keywords.includes("issue")) {
+        return [...baseSteps, "Open the Issues tab.", "Click New issue and complete the template."];
+      }
+      if (match.keywords.includes("pull request")) {
+        return [...baseSteps, "Open Pull requests.", "Click New pull request and choose base/compare branches."];
+      }
+      if (match.keywords.includes("actions")) {
+        return [...baseSteps, "Open Actions.", "Select a workflow run to inspect job logs."];
+      }
+      if (match.keywords.includes("settings")) {
+        return [...baseSteps, "Open Settings.", "Choose the specific settings section from the left sidebar."];
+      }
+      return [...baseSteps, "Use the appropriate repository tab to continue the workflow."];
+    }
+
+    function buildGitHubSources(input, matches) {
+      const searchText = normalizeSearchTerms(input);
+      const repoHint = extractRepoHint(input);
+      const encodedSearch = encodeURIComponent(repoHint || searchText);
+      const links = [
+        githubDocsHome,
+        { label: "GitHub Search", url: `https://github.com/search?q=${encodedSearch}&type=repositories` },
+      ];
+
+      matches.forEach((match) => {
+        (match.paths || []).forEach((path) => {
+          if (!links.some((existing) => existing.url === path.url)) {
+            links.push(path);
+          }
+        });
+      });
+
+      return links;
     }
 
     function normalizeSearchTerms(rawQuestion) {
@@ -629,54 +574,13 @@ while True:
         .replace(/[^a-z0-9\s]/g, " ")
         .replace(/\s+/g, " ")
         .trim();
-      return cleaned || "volunteer opportunities";
+      return cleaned || "github navigation";
     }
 
-    function detectModality(input) {
-      if (input.includes("hybrid")) return "hybrid";
-      if (input.includes("remote") || input.includes("virtual") || input.includes("online")) return "remote";
-      if (input.includes("on-site") || input.includes("onsite") || input.includes("in person")) return "on-site";
-      return "";
-    }
-
-    function detectCause(input) {
-      const causeKeywords = {
-        education: ["education", "school", "tutor", "student", "youth"],
-        environment: ["environment", "climate", "sustainability"],
-        "mental health": ["mental health", "crisis", "helpline"],
-        immigration: ["immigrant", "immigration", "refugee"],
-        "food security": ["food", "hunger", "food bank"],
-        communications: ["communications", "social media", "marketing", "storytelling"],
-      };
-
-      return Object.entries(causeKeywords).find(([, keywords]) =>
-        keywords.some((keyword) => input.includes(keyword))
-      )?.[0] || "";
-    }
-
-    function detectAvailability(input) {
-      if (input.includes("weekend")) return "weekend";
-      if (input.includes("evening")) return "evening";
-      if (input.includes("weekday")) return "weekday";
-      return "";
-    }
-
-    function detectLocation(input) {
-      const locationPattern = /\b(?:in|near|around|at)\s+([a-z\s]+?)(?:\?|$|,|\.| for | with )/i;
+    function extractRepoHint(input) {
+      const locationPattern = /\b(?:repo|repository)\s+([a-z0-9._-]+\/[a-z0-9._-]+)\b/i;
       const match = input.match(locationPattern);
       return match ? match[1].trim().replace(/\s+/g, " ") : "";
-    }
-
-    function capitalizeWord(value) {
-      return value.charAt(0).toUpperCase() + value.slice(1);
-    }
-
-    function capitalizePhrase(value) {
-      return value
-        .split(/\s+/)
-        .filter(Boolean)
-        .map((word) => capitalizeWord(word))
-        .join(" ");
     }
 
     function resetVolunteerChat() {
